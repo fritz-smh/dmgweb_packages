@@ -17,14 +17,20 @@
         <li>
           <a href="{{ url_for("packages") }}">Packages</a>
         </li>
-        <li>
-          <a href="{{ url_for("core_team") }}">Core team</a>
-        </li>
+        {% if g.core_team %}
+          <li>
+            <a href="{{ url_for("core_team") }}">Core team</a>
+          </li>
+        {% endif %}
       </ul>
       <ul class="nav navbar-nav navbar-right">
           {% if g.username %}
           <li>
-              <a href="{{ url_for("user") }}">{{ g.username }}</a>
+              <a href="{{ url_for("user") }}">{{ g.username }}
+              {% if g.core_team %}
+                *
+              {% endif %}
+              </a>
           </li>
         {% endif %}
         <li>

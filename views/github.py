@@ -1,7 +1,7 @@
 # Flask common imports
 from flask import Flask, request, g, session, redirect, url_for
 from flask import render_template, render_template_string
-from application import app, github, User, db_session
+from dmgweb_packages.application import app, github, User, db_session
 
 @github.access_token_getter
 def token_getter():

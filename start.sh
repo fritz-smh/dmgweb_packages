@@ -1,2 +1,2 @@
-export PYTHONPATH=$(dirname $0)
-python $PYTHONPATH/application.py
+export PYTHONPATH=$(dirname $0)/../
+python $PYTHONPATH/dmgweb_packages/application.py

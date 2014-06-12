@@ -27,6 +27,10 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
 
+##### common libs
+
+from dmgweb_packages.common.auth import is_core_team_member
+
 ##### Global vars
 
 DOMOGIK_ORGANISATION = "Domogik"
@@ -87,8 +91,12 @@ def before_request():
     g.user = None
     g.username = None
     if 'user_id' in session:
+        # get user informations
         g.user = User.query.get(session['user_id'])
         g.username = github.get('user')['login']
+        # is the user member of the Domogik organisation ?
+        # True or False
+        g.core_team = is_core_team_member(github, DOMOGIK_ORGANISATION, g.username)
 
 
 @app.after_request
@@ -98,11 +106,11 @@ def after_request(response):
 
 
 ### Views
-from views.index import * 
-from views.core_team import * 
-from views.github import * 
-from views.packages import * 
-from views.user import * 
+from dmgweb_packages.views.index import * 
+from dmgweb_packages.views.core_team import * 
+from dmgweb_packages.views.github import * 
+from dmgweb_packages.views.packages import * 
+from dmgweb_packages.views.user import * 
 
 ### main
 if __name__ == '__main__':
