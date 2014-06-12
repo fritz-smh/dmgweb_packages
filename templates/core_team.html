@@ -1,0 +1,16 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+<div class="container">
+  <h1>Core team members</h1>
+  <p>The following members are part of the Domogik team. They are able to manage the packages</p>
+  <ul>
+    {% for item in members %}
+        <li><a href="{{ item['html_url'] }}">{{ item['login'] }}</a></li>
+    {% endfor %}
+  </ul>
+
+
+</div>
+{% endblock %}
+

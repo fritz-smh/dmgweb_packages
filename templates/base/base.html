@@ -1,0 +1,21 @@
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "bootstrap/fixes.html" as fixes %}
+
+{% block head %}
+{{super()}}
+{{fixes.ie8()}}
+<link href="/static/css/default.css" rel="stylesheet" media="screen">
+{% endblock %}
+
+
+{% block navbar %}
+    {% if not nonav %}
+    {% include "base/nav.html" %}
+    {% endif %}
+{%- endblock navbar %}
+
+
+{% block content %}
+{% endblock %}
+
