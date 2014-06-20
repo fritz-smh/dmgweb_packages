@@ -11,6 +11,7 @@
 from flask import Flask, request, g, session, redirect, url_for
 from flask import render_template, render_template_string
 
+
 # Flask-Github for Oauth with Github
 from flask.ext.github import GitHub
 
@@ -30,6 +31,7 @@ from sqlalchemy.ext.declarative import declarative_base
 ##### common libs
 
 from dmgweb_packages.common.auth import is_core_team_member
+from functools import wraps
 
 ##### Global vars
 
@@ -86,6 +88,16 @@ class User(Base):
 
 ###### Decorators
 
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        print("Login required | g.user = {0}".format(g.user))
+        if g.user is None:
+            return redirect(url_for('login', next=request.url))
+        return f(*args, **kwargs)
+    return decorated_function
+
+
 @app.before_request
 def before_request():
     g.user = None
@@ -104,13 +116,15 @@ def after_request(response):
     db_session.remove()
     return response
 
-
 ### Views
 from dmgweb_packages.views.index import * 
 from dmgweb_packages.views.core_team import * 
 from dmgweb_packages.views.github import * 
 from dmgweb_packages.views.packages import * 
+from dmgweb_packages.views.submit_package import * 
+from dmgweb_packages.views.submission_list import * 
 from dmgweb_packages.views.user import * 
+from dmgweb_packages.views.validate_package import * 
 
 ### main
 if __name__ == '__main__':

@@ -1,0 +1,137 @@
+# Flask common imports
+from flask import Flask, request, g, session, redirect, url_for, flash
+from flask import render_template, render_template_string
+
+from flask_wtf import Form
+from wtforms import TextField, HiddenField
+from wtforms.validators import DataRequired
+
+from dmgweb_packages.application import app, github, login_required
+from dmgweb_packages.common.package import PackageChecker, SubmissionList, SubmissionError
+import json
+import os
+import sys
+import traceback
+import requests
+import re
+import tempfile
+import magic
+import zipfile
+import time
+
+
+
+
+### package related configuration items
+
+#JSON_FILE = "info.json"
+
+# allowed mime types for packages download
+#MIME_ZIP = 'application/zip'
+#ALLOWED_MIMES = [MIME_ZIP]
+
+#URL_REGEXP = re.compile(
+#        r'^https?://'  # http:// or https://
+#        r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+[A-Z]{2,6}\.?|'  # domain...
+#        r'localhost|'  # localhost...
+#        r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
+#        r'(?::\d+)?'  # optional port
+#        r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+
+
+
+### Forms
+
+class FormSubmitPackage(Form):
+    url_package = TextField('url_package', validators=[DataRequired()])
+    url_build_status = TextField('url_build_status')
+    package = HiddenField('package')
+    type = HiddenField('type')
+    name = HiddenField('name')
+    version = HiddenField('version')
+    description = HiddenField('description')
+    author = HiddenField('author')
+    author_email = HiddenField('author_email')
+    tags = HiddenField('tags')
+    step = HiddenField('step')
+
+
+
+@app.route('/submit_package', methods=('GET', 'POST'))
+@login_required
+def submit_package():
+    # TODO : reactivate CSRF !!!!
+    form = FormSubmitPackage(request.form, csrf_enabled=False)
+    
+    print request.form
+    if form.validate_on_submit() and form.step.data == '1':
+        ### data from the form
+        url_package = form.url_package.data
+        url_build_status = form.url_build_status.data
+
+        ### build data from the form
+        # TODO : try to get version from the info.json from the zip file
+        submitter = g.username
+
+        ### try to get the remote zip file
+        the_package = PackageChecker(url_package)
+        ok, message = the_package.download()
+        if not ok:
+            flash(message, "error")
+        else:
+            ok, message = the_package.get_info_json()
+            if not ok:
+                flash(message, "error")
+            else:
+                try:
+                    form.step.data         = '2'
+                    form.version.data      = the_package.get_json()['identity']['version']
+                    form.type.data         = the_package.get_json()['identity']['type']
+                    form.name.data         = the_package.get_json()['identity']['name']
+                    form.package.data      = "{0}_{1}".format(form.type.data, form.name.data)
+                    form.description.data  = the_package.get_json()['identity']['description']
+                    form.tags.data         = the_package.get_json()['identity']['tags']
+                    form.author.data       = the_package.get_json()['identity']['author']
+                    form.author_email.data = the_package.get_json()['identity']['author_email']
+                    # submitter
+                    # remarks
+                except:
+                    flash("It seems there is an error in the json : {0}".format(traceback.format_exc()))
+                
+        try:
+            the_package.delete_downloaded_file()
+        except:
+            # if we can't delete the tmp file, never mind...
+            pass
+        return render_template('submit_package.html', form = form, step = 2)
+
+    elif form.validate_on_submit() and form.step.data == '2':
+        success = False
+        submitted_package = { "url_package" : form.url_package.data,
+                              "url_build_status" : form.url_build_status.data,
+                              "package" : form.package.data,
+                              "type" : form.type.data,
+                              "name" : form.name.data,
+                              "version" : form.version.data,
+                              "description" : form.description.data,
+                              "tags" : form.tags.data,
+                              "author" : form.author.data,
+                              "author_email" : form.author_email.data,
+                              "submitter" : g.username,
+                              "submission_date" : time.time()
+                            }
+        try:
+            submission_list = SubmissionList()
+            submission_list.add(submitted_package)
+            submission_list.list()
+            success = True
+        except SubmissionError as e: 
+            flash(e.value, "error")
+        except:
+            flash(traceback.format_exc(), "error")
+        return render_template('submit_package.html', form = form, step = 3, success = success)
+    else:
+        form.step.data = '1'
+        return render_template('submit_package.html', form = form, step = 1)
+
+

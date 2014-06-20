@@ -1,0 +1,34 @@
+{
+  "model_version" : 1,
+  "packages" : 
+    [  
+      {
+        "package" : "plugin_diskfree",
+        "type" : "plugin",
+        "name" : "diskfree",
+        "version" : "nighlty",
+        "url_package" : "https://github.com/fritz-smh/domogik-plugin-diskfree/archive/master.zip",
+        "url_test" : "https://travis-ci.org/fritz-smh/domogik-plugin-diskfree",
+        "picture_test" : "https://api.travis-ci.org/fritz-smh/domogik-plugin-diskfree.svg",
+        "author" : "fritz-smh",
+        "author_website" : "https://github.com/fritz-smh",
+        "remarks" : "foo",
+        "tags" : "TODO later",
+        "progress" : 90
+      },
+      {
+        "package" : "plugin_rfxcom",
+        "type" : "plugin",
+        "name" : "rfxcom",
+        "version" : "nighlty",
+        "url_package" : "https://github.com/fritz-smh/domogik-plugin-rfxcom/archive/master.zip",
+        "url_test" : "https://travis-ci.org/fritz-smh/domogik-plugin-rfxcom",
+        "picture_test" : "https://api.travis-ci.org/fritz-smh/domogik-plugin-rfxcom.svg",
+        "author" : "fritz-smh",
+        "author_website" : "https://github.com/fritz-smh",
+        "remarks" : "foo",
+        "tags" : "TODO later",
+        "progress" : 70
+      }
+    ]
+}

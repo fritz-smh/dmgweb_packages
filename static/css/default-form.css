@@ -1,0 +1,4 @@
+form .errors {
+    background:#ffecec url('/static/images/error.png') no-repeat 10px 50%;
+    list-style: none;
+}

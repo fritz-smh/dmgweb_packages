@@ -1,0 +1,76 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+
+<div class="container">
+  <h1>Packages</h1>
+  {% if error %}
+  <div class='error'>ERROR : {{ error }}</div>
+  {% endif %}
+
+  {% if sub_list|length == 0 %}
+    <p>There is no submitted package</p>
+
+  {% else %}
+    <div class="input-group"> <span class="input-group-addon">Search</span>
+      <input id="filter" type="text" class="form-control" placeholder="Type here...">
+    </div>
+    <table class="table table-striped table-hover table-condensed">
+      <thead> 
+        <tr>
+          <td>Submitted by</td>
+          <td>Type</td>
+          <td>Name</td>
+          <td>Version</td>
+          <td>Test status</td>
+          <td>Submission date</td>
+        </tr>
+      </thead>
+      <tbody class="searchable">
+        {% for item in sub_list %}
+          <tr>
+          <!--<tr class="accordion-toggle">-->
+            <td>{{ item.submitter }}</td>
+            <td>{{ item.type }}</td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.version }}</td>
+            <td><img src='{{ item.url_build_status }}'/></td>
+            <td>{{ item.submission_date }}</td>
+          </tr>
+          <tr class="accordion-toggle">
+            <td colspan="6" class="hiddenRow">
+              <ul>
+                <li>
+                  Package url : {{ item.url_package }}
+                </li>
+                <li>
+                  Description : {{ item.description }}
+                </li>
+                <li>
+                  Author : {{ item.author }} {% if g.core_team %} {{ item.author_email }} {% endif %}
+                </li>
+                <li>
+                  Tags : {{ item.tags }}
+                </li>
+                <li>
+                  <strong>Installation</strong>
+                  <pre>
+                    dmg_package --install {{ item.url_package }}
+                  </pre>
+              </ul>
+              {% if g.core_team %}
+                <div>
+                  <a href="{{ url_for("validate_package") }}?type={{ item.type }}&name={{ item.name }}&version={{ item.version }}">Validate the package</a>
+                  <a href="#">TODO : Refuse the package</a>
+                </div>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+
+</div>
+{% endblock %}
+

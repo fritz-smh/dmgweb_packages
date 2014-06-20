@@ -17,6 +17,14 @@
         <li>
           <a href="{{ url_for("packages") }}">Packages</a>
         </li>
+        <li>
+          <a href="{{ url_for("submission_list") }}">Submitted packages</a>
+        </li>
+        {% if g.username %}
+          <li>
+            <a href="{{ url_for("submit_package") }}">Submit a package</a>
+          </li>
+        {% endif %}
         {% if g.core_team %}
           <li>
             <a href="{{ url_for("core_team") }}">Core team</a>
@@ -37,7 +45,7 @@
           {% if g.user %}
               <a href="{{ url_for("logout") }}">Logout</a> 
           {% else %}
-              <a href="{{ url_for("login") }}">Login</a>
+              <a href="{{ url_for("login") }}">Login (github Oauth)</a>
           {% endif %}
         </li>
       </ul>

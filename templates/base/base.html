@@ -6,16 +6,54 @@
 {{super()}}
 {{fixes.ie8()}}
 <link href="/static/css/default.css" rel="stylesheet" media="screen">
+<link href="/static/css/default-flashes.css" rel="stylesheet" media="screen">
+<link href="/static/css/default-form.css" rel="stylesheet" media="screen">
+<script src="/static/js/jquery.min.js"></script>
+<script src="/static/js/bootstrap-notify.js"></script>
+
+<script type='text/javascript'>//<![CDATA[ 
+  $(window).load(function(){
+    $(document).ready(function () {
+
+      (function ($) {
+
+          $('#filter').keyup(function () {
+
+              var rex = new RegExp($(this).val(), 'i');
+              $('.searchable tr').hide();
+              $('.searchable tr').filter(function () {
+                  return rex.test($(this).text());
+              }).show();
+
+          })
+
+      }(jQuery));
+
+    });
+  });//]]>  
+
+  </script>
 {% endblock %}
 
 
 {% block navbar %}
-    {% if not nonav %}
+  {% if not nonav %}
     {% include "base/nav.html" %}
-    {% endif %}
-{%- endblock navbar %}
+  {% endif %}
 
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <ul class="flashes">
+      {% for category, msg in messages %}
+         <div class="flash {{category}}">
+           <span>{{category}} : </span> {{ msg }}
+         </div>
+      {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+
+{%- endblock navbar %}
 
 {% block content %}
 {% endblock %}
-
