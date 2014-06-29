@@ -8,6 +8,7 @@
 <link href="/static/css/default.css" rel="stylesheet" media="screen">
 <link href="/static/css/default-flashes.css" rel="stylesheet" media="screen">
 <link href="/static/css/default-form.css" rel="stylesheet" media="screen">
+<link href="/static/css/default-package-list.css" rel="stylesheet" media="screen">
 <script src="/static/js/jquery.min.js"></script>
 <script src="/static/js/bootstrap-notify.js"></script>
 
@@ -17,6 +18,18 @@
 
       (function ($) {
 
+          // search function for div items
+          $('#filter_section').keyup(function () {
+
+              var rex = new RegExp($(this).val(), 'i');
+              $('.searchable section').hide();
+              $('.searchable section').filter(function () {
+                  return rex.test($(this).text());
+              }).show();
+
+          });
+
+          // search function for table tr items
           $('#filter').keyup(function () {
 
               var rex = new RegExp($(this).val(), 'i');
@@ -25,7 +38,7 @@
                   return rex.test($(this).text());
               }).show();
 
-          })
+          });
 
       }(jQuery));
 

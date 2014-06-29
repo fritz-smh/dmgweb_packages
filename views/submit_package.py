@@ -90,7 +90,7 @@ def submit_package():
                     form.name.data         = the_package.get_json()['identity']['name']
                     form.package.data      = "{0}_{1}".format(form.type.data, form.name.data)
                     form.description.data  = the_package.get_json()['identity']['description']
-                    form.tags.data         = the_package.get_json()['identity']['tags']
+                    form.tags.data         = ",".join(the_package.get_json()['identity']['tags'])
                     form.author.data       = the_package.get_json()['identity']['author']
                     form.author_email.data = the_package.get_json()['identity']['author_email']
                     # submitter

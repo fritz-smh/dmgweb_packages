@@ -212,6 +212,9 @@ class SubmissionList():
         # check if the file exists
         if os.path.isfile(SUBMITTED_PACKAGES_LIST):
             self.json = json.load(open(SUBMITTED_PACKAGES_LIST))
+            # change the tags from foo, bar, ... to a list
+            for pkg in self.json:
+                pkg['tags'] = pkg['tags'].split(",")
         else:
             self.json = []
         print("Submission list : {0}".format(self.json))
