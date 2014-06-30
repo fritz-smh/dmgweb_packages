@@ -27,10 +27,6 @@ pre {
     padding: 1em;
 }
 
-.build {
-    float: right;
-}
-
 .author {
     font-weight: bold;
 }
@@ -69,9 +65,12 @@ pre {
 
 .build {
     margin-top: 1ex;
+    margin-bottom: 1ex;
 }
 
-/*** details ***/
+.right {
+    text-align: right;
+}
 
 /*** admin informations ***/
 

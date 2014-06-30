@@ -19,7 +19,7 @@ def validate_package():
     print(request.args)
     try:
         sub_list = SubmissionList()
-        sub_list.validate(request.args["type"], request.args["name"], request.args["version"])
+        sub_list.validate(request.args["type"], request.args["name"], request.args["version"], g.username)
         flash("Package {0}_{1} in version {2} validated and removed from the submission list".format(request.args["type"], request.args["name"], request.args["version"]), "success")
     except:
         flash(traceback.format_exc())

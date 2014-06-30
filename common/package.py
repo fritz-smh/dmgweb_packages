@@ -35,7 +35,7 @@ URL_REGEXP = re.compile(
 
 
 
-class PackageListError(Exception):
+class PackagesListError(Exception):
 
     def __init__(self, value):
         self.value = value
@@ -226,7 +226,8 @@ class SubmissionList():
             self.json = json.load(open(SUBMITTED_PACKAGES_LIST))
             # change the tags from foo, bar, ... to a list
             for pkg in self.json:
-                pkg['tags'] = pkg['tags'].split(",")
+                if type(pkg['tags']).__name__ != "list":
+                    pkg['tags'] = pkg['tags'].split(",")
         else:
             self.json = []
         print("Submission list : {0}".format(self.json))
@@ -245,6 +246,7 @@ class SubmissionList():
                raise SubmissionError("This package has already been submitted by {0} (unique key is type/name/version)".format(pkg["submitter"]))
                return
         # add in the list
+        print("DATA : {0}".format(data))
         self.json.append(data)
         self.save()
 
@@ -281,13 +283,16 @@ class SubmissionList():
         except:
             raise error("Unable to save the submission list : {0}".format(traceback.format_exc()))
     
-    def validate(self, type, name, version):
+    def validate(self, type, name, version, user):
         """ Validate a package :
             - add it in the packages list
             - delete it from the submission list
         """
         pkg_list = PackagesList()
-        pkg_list.add(self.get_package(type, name, version))
+        pkg = self.get_package(type, name, version)
+        pkg['validation_date'] = time.time()
+        pkg['validation_by'] = user
+        pkg_list.add(pkg)
         self.delete(type, name, version)
     
 

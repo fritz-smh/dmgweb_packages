@@ -3,20 +3,40 @@
 {% block content %}
 
 <div class="container">
-  <h1>Packages</h1>
-  {% if error %}
-  <div class='error'>ERROR : {{ error }}</div>
-  {% endif %}
+  {% if view == "submission_list" %}
+    <h1>Submitted packages</h1>
+    <div class="jumbotron">
+      <p>
+        The following packages are waiting for a validation! They could contain some bugs or contain malicious code! You should not install them unless you are totally trusting the package author.
+      </p>
+      <p>
+        <a href="{{ url_for("packages") }}">Please find the validated packages in the dedicated page!</a>
+      </p>
+    </div>
 
-  {% if sub_list|length == 0 %}
-    <p>There is no submitted package</p>
-
-  {% else %}
     <div class="search input-group"> <span class="input-group-addon">Search</span>
       <input id="filter_section" type="text" class="form-control" placeholder="Type here...">
     </div>
+  {% elif view == "packages_list" %}
+    <h1>Packages</h1>
+  {% endif %}
+
+  {% if error %}
+    <div class='error'>ERROR : {{ error }}</div>
+  {% endif %}
+
+  {% if pkg_list|length == 0 %}
+
+    {% if view == "submission_list" %}
+      <p>There is no submitted package.</p>
+    {% elif view == "packages_list" %}
+      <p>There is no package.</p>
+    {% endif %}
+
+  {% else %}
+
     <div class="searchable row row-centered">
-      {% for item in sub_list %}
+      {% for item in pkg_list %}
         <section class="package">
           <!-- row 1 -->
           <div class="row">
@@ -63,12 +83,18 @@
   
             <!-- column 3 -->
             <div class="col-md-4">
-              <div class="pull-right">
-                <div>
+              <div>
+                <div class="right">
                   <a class="btn btn-default" data-toggle="modal" data-target="#modal_details_{{ item.type }}_{{ item.name }}_{{ item.version|replace(".", "_") }}" href="#" >More details</a>
                 </div>
-                <div class="build">
+                <div class="build right">
                   {% if item.url_build_status %} <img class="build" src='{{ item.url_build_status }}'/> {% endif %}
+                </div>
+                <div class="right">
+                  {% if view == "submission_list" and g.core_team %}
+                    <a class="btn btn-warning" href="{{ url_for("validate_package") }}?type={{ item.type }}&name={{ item.name }}&version={{ item.version }}">Validate</a>
+                    <a class="btn btn-warning" href="#">Refuse</a>
+                  {% endif %}
                 </div>
               </div>
             </div>
@@ -76,12 +102,6 @@
 
 
 
-          <div>
-            {% if g.core_team %}
-              <a href="{{ url_for("validate_package") }}?type={{ item.type }}&name={{ item.name }}&version={{ item.version }}">Validate the package</a>
-              <a href="#">TODO : Refuse the package</a>
-            {% endif %}
-          </div>
 
           <div id="modal_install_{{ item.type }}_{{ item.name }}_{{ item.version|replace(".", "_") }}" class="modal fade">
             <div class="modal-dialog">
@@ -115,6 +135,9 @@
                 <div class="modal-body">
                   <ul>
                     <li>Submitted by : {{ item.submitter }} on {{ item.submission_date }}</li>
+                    {% if item.validation_by %}
+                      <li>Validated by : {{ item.validation_by }} on {{ item.validation_date }}</li>
+                    {% endif %}
                   </ul>
                 </div>
                 <div class="modal-footer">

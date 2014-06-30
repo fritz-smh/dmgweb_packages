@@ -11,5 +11,5 @@ import traceback
 def packages():
     pkg_list = PackagesList()
 
-    return render_template('packages.html', pkg_list = pkg_list.list())
+    return render_template('packages_list.html', view = 'packages_list', pkg_list = pkg_list.list())
 

@@ -2,7 +2,7 @@
 from flask import Flask, request, g, session, redirect, url_for, flash
 from flask import render_template, render_template_string
 from dmgweb_packages.application import app, github
-from dmgweb_packages.common.package import PACKAGES_LIST, SubmissionList
+from dmgweb_packages.common.package import PACKAGES_LIST, SubmissionList, SubmissionError
 import json
 import os
 import traceback
@@ -13,5 +13,5 @@ def submission_list():
         sub_list = SubmissionList() 
     except SubmissionError as e:
         flash(e.value, "error")
-    return render_template('submission_list.html', sub_list = sub_list.list())
+    return render_template('packages_list.html', view = 'submission_list', pkg_list = sub_list.list())
 
