@@ -14,11 +14,16 @@
       </p>
     </div>
 
-    <div class="search input-group"> <span class="input-group-addon">Search</span>
-      <input id="filter_section" type="text" class="form-control" placeholder="Type here...">
-    </div>
   {% elif view == "packages_list" %}
     <h1>Packages</h1>
+
+  {% elif view == "refused_list" %}
+    <h1>Refused packages</h1>
+    <div class="jumbotron">
+      <p>
+        The following packages are NOT valid. They have been rejected. This list is readable only by developpers to help them understand why some packages has been refused.
+      </p>
+    </div>
   {% endif %}
 
   {% if error %}
@@ -35,6 +40,10 @@
 
   {% else %}
 
+    <div class="search input-group"> <span class="input-group-addon">Search</span>
+      <input id="filter_section" type="text" class="form-control" placeholder="Type here...">
+    </div>
+
     <div class="searchable row row-centered">
       {% for item in pkg_list %}
         <section class="package">
@@ -49,7 +58,9 @@
             <!-- column 2 -->
             <div class="col-md-6">
               <span class="pull-right">
-                <a class="btn btn-primary" data-toggle="modal" data-target="#modal_install_{{ item.type }}_{{ item.name }}_{{ item.version|replace(".", "_") }}" href="#" ><span class='glyphicon glyphicon-saved' aria-hidden='true'></span> Install</a>
+                {% if view != "refused_list" %}
+                  <a class="btn btn-primary" data-toggle="modal" data-target="#modal_install_{{ item.type }}_{{ item.name }}_{{ item.version|replace(".", "_") }}" href="#" ><span class='glyphicon glyphicon-saved' aria-hidden='true'></span> Install</a>
+                {% endif %}
                 <a class="btn btn-info download" href="{{ item.url_package }}"><span class='glyphicon glyphicon-save' aria-hidden='true'></span> Download sources</a>
               </span>
             </div>
@@ -68,6 +79,12 @@
               <div class="author">
                 By {{ item.author }} {% if g.core_team %} <span class="admin">{{ item.author_email }} </span> {% endif %}
               </div>
+              {% if view == "refused_list" %}
+                <div class="alert alert-danger">
+                  <p><strong>This package has been refused by {{ item.refused_by }} on {{ item.refused_date }}</strong></p>
+                  <p><strong>The reason is : </strong> {{ item.refused_reason }}</p>
+                </div> 
+              {% endif %}
               <p class="description">
                 {{ item.description }}
               </p>
@@ -93,7 +110,7 @@
                 <div class="right">
                   {% if view == "submission_list" and g.core_team %}
                     <a class="btn btn-warning" href="{{ url_for("validate_package") }}?type={{ item.type }}&name={{ item.name }}&version={{ item.version }}">Validate</a>
-                    <a class="btn btn-warning" href="#">Refuse</a>
+                    <a class="btn btn-warning" data-toggle="modal" data-target="#modal_refused_{{ item.type }}_{{ item.name }}_{{ item.version|replace(".", "_") }}" href="#">Refuse</a>
                   {% endif %}
                 </div>
               </div>
@@ -143,6 +160,30 @@
                 <div class="modal-footer">
                   <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
+              </div>
+            </div>
+          </div>
+                
+          <div id="modal_refused_{{ item.type }}_{{ item.name }}_{{ item.version|replace(".", "_") }}" class="modal fade">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <form method="post" action="{{ url_for("refuse_package") }}">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">Refuse a package</h4>
+                  </div>
+                  <div class="modal-body">
+                    <input name="type" type="hidden" value="{{ item.type }}">
+                    <input name="name" type="hidden" value="{{ item.name }}">
+                    <input name="version" type="hidden" value="{{ item.version }}">
+                    <p><label class="control-label">Give a reason to refuse the package :</label></p>
+                    <textarea class="" name="reason" rows="4" placeholder="The reason..."></textarea>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" href="{{ url_for("refuse_package") }}?type={{ item.type }}&name={{ item.name }}&version={{ item.version }}&reason=foobar">Refuse the package</button>
+                  </div>
+                </form>
               </div>
             </div>
           </div>

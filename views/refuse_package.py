@@ -12,16 +12,16 @@ from dmgweb_packages.common.package import PackageChecker, SubmissionList, Submi
 import traceback
 
 
-@app.route('/validate_package')
+@app.route('/refuse_package', methods=('POST', 'PUT'))
 @login_required
 @core_team_required
-def validate_package():
-    print("Validate!")
-    print(request.args)
+def refuse_package():
+    print request.method
+    print request.form
     try:
         sub_list = SubmissionList()
-        sub_list.validate(request.args["type"], request.args["name"], request.args["version"], g.username)
-        flash("Package {0}_{1} in version {2} validated and removed from the submission list".format(request.args["type"], request.args["name"], request.args["version"]), "success")
+        sub_list.refuse(request.form["type"], request.form["name"], request.form["version"], g.username, request.form["reason"])
+        flash("Package {0}_{1} in version {2} refused and removed from the submission list".format(request.form["type"], request.form["name"], request.form["version"]), "success")
     except:
         flash(traceback.format_exc())
     return redirect(url_for("submission_list")) 

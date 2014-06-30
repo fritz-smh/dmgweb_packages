@@ -97,6 +97,16 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+def core_team_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        print("G={0}".format(g.core_team))
+        if not g.core_team:
+            flash("Access denied !")
+            return redirect(url_for('index'))
+        return f(*args, **kwargs)
+    return decorated_function
+
 
 @app.before_request
 def before_request():
@@ -123,8 +133,10 @@ from dmgweb_packages.views.github import *
 from dmgweb_packages.views.icons import * 
 from dmgweb_packages.views.packages import * 
 from dmgweb_packages.views.submit_package import * 
+from dmgweb_packages.views.refused_list import * 
 from dmgweb_packages.views.submission_list import * 
 from dmgweb_packages.views.user import * 
+from dmgweb_packages.views.refuse_package import * 
 from dmgweb_packages.views.validate_package import * 
 
 ### main

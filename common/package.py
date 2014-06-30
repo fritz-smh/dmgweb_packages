@@ -16,9 +16,10 @@ import shutil
 
 JSON_FILE = "info.json"
 ICON_FILE = "design/icon.png"
-PACKAGES_LIST = "data/packages.json"
 ICONS_DIR = "data/icons/"
+PACKAGES_LIST = "data/packages.json"
 SUBMITTED_PACKAGES_LIST = "data/submitted_packages.json"
+REFUSED_PACKAGES_LIST = "data/refused_packages.json"
 
 
 # allowed mime types for packages download
@@ -45,6 +46,15 @@ class PackagesListError(Exception):
 
 
 class SubmissionError(Exception):
+
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return repr(self.value)
+
+
+class RefusedError(Exception):
 
     def __init__(self, value):
         self.value = value
@@ -295,4 +305,61 @@ class SubmissionList():
         pkg_list.add(pkg)
         self.delete(type, name, version)
     
+    def refuse(self, type, name, version, user, reason):
+        """ Refuse a package :
+            - add it in the refused packages list
+            - delete it from the submission list
+        """
+        pkg_list = RefusedList()
+        pkg = self.get_package(type, name, version)
+        pkg['refused_date'] = time.time()
+        pkg['refused_by'] = user
+        pkg['refused_reason'] = reason
+        pkg_list.add(pkg)
+        self.delete(type, name, version)
+    
 
+
+class RefusedList():
+    """ Class to manage the list of refused packages
+    """
+
+    def __init__(self):
+        ### load the json
+        # check if the file exists
+        if os.path.isfile(REFUSED_PACKAGES_LIST):
+            self.json = json.load(open(REFUSED_PACKAGES_LIST))
+        else:
+            self.json = []
+        print("Refused packages : {0}".format(self.json))
+        pass
+
+    def list(self):
+        """ Return the list of refused packages
+        """
+        return self.json
+    
+    def add(self, data):
+        """ add a package to the refused list
+        """
+        # we do not make any check about unicity here... this is just an history
+        # add in the list
+        self.json.append(data)
+        self.save()
+
+    def delete(self, type, name, version):
+        """ delete a package from the refused list
+        """
+        # TODO : no need currently
+        pass
+
+    def save(self):
+        """ Save the list of refused packages
+        """
+        try:
+            my_file = open(REFUSED_PACKAGES_LIST, "w")
+            my_file.write(json.dumps(self.json))
+            my_file.close()
+        except:
+            raise error("Unable to save the refused packages list : {0}".format(traceback.format_exc()))
+    
