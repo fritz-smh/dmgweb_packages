@@ -18,10 +18,14 @@
     <div class="searchable">
       {% for item in sub_list %}
         <section class="package">
-          <h2>{{ item.type }} - {{ item.name }} - <span class="version">version {{ item.version }}</span><img class="build" src='{{ item.url_build_status }}'/></h2>
-          <p class="author">
+          <h2>{{ item.type }} - {{ item.name }} - <span class="version">version {{ item.version }}</span> {% if item.url_build_status %} <img class="build" src='{{ item.url_build_status }}'/> {% endif %}</h2>
+          <div class="main_actions">
+            <a class="btn btn-primary" data-toggle="modal" data-target="#modal_install_{{ item.type }}_{{ item.name }}_{{ item.version|replace(".", "_") }}" href="#" ><span class='glyphicon glyphicon-saved' aria-hidden='true'></span> Install</a>
+            <a class="btn btn-info download" href="{{ item.url_package }}"><span class='glyphicon glyphicon-save' aria-hidden='true'></span> Download sources</a>
+          </div>
+          <div class="author">
             By {{ item.author }} {% if g.core_team %} <span class="admin">{{ item.author_email }} </span> {% endif %}
-          </p>
+          </div>
           <p class="description">
             {{ item.description }}
           </p>
@@ -34,25 +38,56 @@
             {% endfor %}
           </ul>
 
-          <div class="details">
-          <span>More details</span>
-          <ul>
-            {% if g.core_team %}
-              <li class="admin">Submitted by : {{ item.submitter }} on {{ item.submission_date }}</li>
-            {% endif %}
-          </ul>
 
           <div>
-            <a class="install" href="#">Install</a>
-            <a class="download" href="{{ item.url_package }}">Download the package sources</a>
+            <a class="btn btn-default" data-toggle="modal" data-target="#modal_details_{{ item.type }}_{{ item.name }}_{{ item.version|replace(".", "_") }}" href="#" >More details</a>
             {% if g.core_team %}
               <a href="{{ url_for("validate_package") }}?type={{ item.type }}&name={{ item.name }}&version={{ item.version }}">Validate the package</a>
               <a href="#">TODO : Refuse the package</a>
             {% endif %}
           </div>
-          <pre class="install_instructions">
-             dmg_package --install {{ item.url_package }}
-          </pre>
+
+          <div id="modal_install_{{ item.type }}_{{ item.name }}_{{ item.version|replace(".", "_") }}" class="modal fade">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                  <h4 class="modal-title" id="myModalLabel">Install the package</h4>
+                </div>
+                <div class="modal-body">
+                  <h3>Instructions</h3>
+                    <p>
+                      Just execute the given command line in a terminal as the domogik user.
+                    </p>
+                  <h3>Command line</h3>
+                    <pre>dmg_package --install {{ item.url_package }}</pre>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="modal_details_{{ item.type }}_{{ item.name }}_{{ item.version|replace(".", "_") }}" class="modal fade">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                  <h4 class="modal-title" id="myModalLabel">More details</h4>
+                </div>
+                <div class="modal-body">
+                  <ul>
+                    <li>Submitted by : {{ item.submitter }} on {{ item.submission_date }}</li>
+                  </ul>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+                
         </section>
       {% endfor %}
     </div>

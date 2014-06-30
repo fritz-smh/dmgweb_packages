@@ -8,8 +8,19 @@
     padding: 1em 1em 1em 1em;
 }
 
+.package h2 {
+    margin-top: 0;
+}
+
 h2 .version {
     font-size: 0.8em;
+}
+
+pre {
+    overflow: auto;
+    word-wrap: normal;
+    white-space: pre;
+    padding: 1em;
 }
 
 .build {
@@ -20,31 +31,17 @@ h2 .version {
     font-weight: bold;
 }
 
+.main_actions {
+    float: right;
+}
+
 
 /*** links ***/
 
-.download:before {
-    content: url('../images/download.png');
-    margin-right: 1ex;
-}
-
-.download, .install {
-    color: #ffffff;
-    background-color: #005774;
-    border-color: #005774 #D9D9D9 #D9D9D9;
-    border-image: none;
-    border: 1px solid #D9D9D9;
-    padding: 0.5em;
-    margin: 1em;
-}
-
-.download:hover {
-    color: #ffffff;
-}
-
-.download:visited {
-    color: #ffffff;
-}
+//.download:before {
+//    content: url('../images/download.png');
+//    margin-right: 1ex;
+//}
 
 
 /*** tags ***/
