@@ -7,6 +7,7 @@ import tempfile
 import magic
 import zipfile
 import time
+import shutil
 
 
 
@@ -14,7 +15,9 @@ import time
 ### package related configuration items
 
 JSON_FILE = "info.json"
+ICON_FILE = "design/icon.png"
 PACKAGES_LIST = "data/packages.json"
+ICONS_DIR = "data/icons/"
 SUBMITTED_PACKAGES_LIST = "data/submitted_packages.json"
 
 
@@ -122,6 +125,15 @@ class PackageChecker():
             except KeyError:
                 return False, "There is no file named '{0}' in this zip archive!".format(json_file)
             self.json_data = json.load(fp_json)
+
+            # extract the package icon
+            for member in myzip.namelist():
+                print member
+            source = myzip.open(os.path.join(root_dir, ICON_FILE))
+            target = file(os.path.join(ICONS_DIR, "{0}_{1}_{2}.png".format(self.json_data['identity']['type'], self.json_data['identity']['name'], self.json_data['identity']['version'])), "wb")
+            with source, target:
+                shutil.copyfileobj(source, target)
+ 
 
             return True, None
 

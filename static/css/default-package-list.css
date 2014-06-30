@@ -16,6 +16,10 @@ h2 .version {
     font-size: 0.8em;
 }
 
+.search {
+    margin-bottom: 1em;
+}
+
 pre {
     overflow: auto;
     word-wrap: normal;
@@ -31,9 +35,6 @@ pre {
     font-weight: bold;
 }
 
-.main_actions {
-    float: right;
-}
 
 
 /*** links ***/
@@ -65,6 +66,10 @@ pre {
   
     border-radius: 3px 3px 3px 3px;  
 }  
+
+.build {
+    margin-top: 1ex;
+}
 
 /*** details ***/
 

@@ -120,6 +120,7 @@ def after_request(response):
 from dmgweb_packages.views.index import * 
 from dmgweb_packages.views.core_team import * 
 from dmgweb_packages.views.github import * 
+from dmgweb_packages.views.icons import * 
 from dmgweb_packages.views.packages import * 
 from dmgweb_packages.views.submit_package import * 
 from dmgweb_packages.views.submission_list import * 
