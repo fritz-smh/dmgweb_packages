@@ -3,11 +3,12 @@ from flask import Flask, request, g, session, redirect, url_for, flash
 from flask import render_template, render_template_string
 
 from flask_wtf import Form
-from wtforms import TextField, HiddenField
+from wtforms import TextField, HiddenField, SelectField
 from wtforms.validators import DataRequired
 
 from dmgweb_packages.application import app, github, login_required
 from dmgweb_packages.common.package import PackageChecker, SubmissionList, SubmissionError
+from dmgweb_packages.common.category import Categories, CategoriesError
 import json
 import os
 import sys
@@ -21,28 +22,14 @@ import time
 
 
 
-
-### package related configuration items
-
-#JSON_FILE = "info.json"
-
-# allowed mime types for packages download
-#MIME_ZIP = 'application/zip'
-#ALLOWED_MIMES = [MIME_ZIP]
-
-#URL_REGEXP = re.compile(
-#        r'^https?://'  # http:// or https://
-#        r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+[A-Z]{2,6}\.?|'  # domain...
-#        r'localhost|'  # localhost...
-#        r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
-#        r'(?::\d+)?'  # optional port
-#        r'(?:/?|[/?]\S+)$', re.IGNORECASE)
-
-
-
 ### Forms
 
 class FormSubmitPackage(Form):
+
+    # prepare some data
+    categories = Categories()
+    
+    # form
     url_package = TextField('url_package', validators=[DataRequired()])
     url_build_status = TextField('url_build_status')
     package = HiddenField('package')
@@ -55,6 +42,7 @@ class FormSubmitPackage(Form):
     tags = HiddenField('tags')
     hash_sha256 = HiddenField('hash_sha256')
     step = HiddenField('step')
+    category = SelectField('category', choices=categories.list_for_wtf())
 
 
 
@@ -111,6 +99,7 @@ def submit_package():
     elif form.validate_on_submit() and form.step.data == '2':
         success = False
         submitted_package = { "url_package" : form.url_package.data,
+                              "category" : form.category.data,
                               "url_build_status" : form.url_build_status.data,
                               "package" : form.package.data,
                               "type" : form.type.data,

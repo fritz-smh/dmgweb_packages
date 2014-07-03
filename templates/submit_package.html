@@ -27,7 +27,10 @@
     <div class="form-group ">
       <label class="control-label">Package url :</label> {{ form.url_package }}
     </div>
-    {% if form.url_build_status %}
+    <div class="form-group ">
+      <label class="control-label">Candidate for the category :</label> {{ form.category }}
+    </div>
+    {% if step == 1 or form.url_build_status.data %}
       <div class="form-group ">
         <label class="control-label">Build status :</label> {% if step == 2 %}<img src="{{ form.url_build_status.data }}"/> {% endif %} {{ form.url_build_status }}
       </div>

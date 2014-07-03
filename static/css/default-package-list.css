@@ -16,6 +16,10 @@ h2 .version {
     font-size: 0.8em;
 }
 
+.category {
+    color: red;
+}
+
 .search {
     margin-bottom: 1em;
 }
