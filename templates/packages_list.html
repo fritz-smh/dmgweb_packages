@@ -151,6 +151,7 @@
                 </div>
                 <div class="modal-body">
                   <ul>
+                    <li>Hash (sha256) : {{ item.hash_sha256 }} </li>
                     <li>Submitted by : {{ item.submitter }} on {{ item.submission_date }}</li>
                     {% if item.validation_by %}
                       <li>Validated by : {{ item.validation_by }} on {{ item.validation_date }}</li>

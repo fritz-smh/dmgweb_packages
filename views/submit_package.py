@@ -53,6 +53,7 @@ class FormSubmitPackage(Form):
     author = HiddenField('author')
     author_email = HiddenField('author_email')
     tags = HiddenField('tags')
+    hash_sha256 = HiddenField('hash_sha256')
     step = HiddenField('step')
 
 
@@ -93,6 +94,8 @@ def submit_package():
                     form.tags.data         = ",".join(the_package.get_json()['identity']['tags'])
                     form.author.data       = the_package.get_json()['identity']['author']
                     form.author_email.data = the_package.get_json()['identity']['author_email']
+                    form.hash_sha256.data = the_package.get_json()['hash_sha256']
+                    print form.hash_sha256.data
                     # submitter
                     # remarks
                 except:
@@ -117,6 +120,7 @@ def submit_package():
                               "tags" : form.tags.data,
                               "author" : form.author.data,
                               "author_email" : form.author_email.data,
+                              "hash_sha256" : form.hash_sha256.data,
                               "submitter" : g.username,
                               "submission_date" : time.time()
                             }

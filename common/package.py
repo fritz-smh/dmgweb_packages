@@ -8,6 +8,7 @@ import magic
 import zipfile
 import time
 import shutil
+import hashlib
 
 
 
@@ -111,6 +112,10 @@ class PackageChecker():
     def get_info_json(self):
         """ Get the info.json file from the zip
         """
+        # get the hash of the file to check it has not change
+        hash_sha256 = hashlib.sha256(open(self.downloaded_file, 'rb').read()).hexdigest()
+        print hash_sha256 
+        
         # check the zip file contains what we need
         with zipfile.ZipFile(self.downloaded_file, 'r') as myzip:
             # test the zip file
@@ -135,6 +140,8 @@ class PackageChecker():
             except KeyError:
                 return False, "There is no file named '{0}' in this zip archive!".format(json_file)
             self.json_data = json.load(fp_json)
+            self.json_data["hash_sha256"] = hash_sha256
+            print self.json_data
 
             # extract the package icon
             for member in myzip.namelist():
