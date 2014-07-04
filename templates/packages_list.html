@@ -111,6 +111,7 @@
                 <div class="right">
                   {% if view == "packages_list" and g.core_team %}
                     <a class="btn btn-warning"  data-toggle="modal" data-target="#modal_category_{{ item.type }}_{{ item.name }}_{{ item.version|replace(".", "_") }}" href="#">Category</a>
+                    <a class="btn btn-danger"  data-toggle="modal" data-target="#modal_delete_{{ item.type }}_{{ item.name }}_{{ item.version|replace(".", "_") }}" href="#">Delete</a>
                   {% endif %}
 
                   {% if view == "submission_list" and g.core_team %}
@@ -247,6 +248,37 @@
                     <div class="modal-footer">
                       <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                       <button type="submit" class="btn btn-primary" href="{{ url_for("change_category") }}">Change the category</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+            <div id="modal_delete_{{ item.type }}_{{ item.name }}_{{ item.version|replace(".", "_") }}" class="modal fade">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <form method="post" action="{{ url_for("delete_package") }}">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                      <h4 class="modal-title" id="myModalLabel">Delete a package</h4>
+                    </div>
+                    <div class="modal-body">
+                      <input name="type" type="hidden" value="{{ item.type }}">
+                      <input name="name" type="hidden" value="{{ item.name }}">
+                      <input name="version" type="hidden" value="{{ item.version }}">
+                      <p>You will definitly remove the package from the packages list! If you want to just set it as an old package, <strong>you may set its category to one of the following categories : </strong></p>
+                      <ul>
+                        {% for category in categories %}
+                          {% if category.is_obsolete %}
+                          <li>{{ category.name }} (id={{ category.id }})</li>
+                          {% endif %}
+                        {% endfor %}
+                      </ul>
+                      <p>Are you really sure you want to delete the package ?</p>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                      <button type="submit" class="btn btn-danger" href="{{ url_for("delete_package") }}">Delete the oackage</button>
                     </div>
                   </form>
                 </div>

@@ -130,6 +130,7 @@ def after_request(response):
 from dmgweb_packages.views.index import * 
 from dmgweb_packages.views.change_category import * 
 from dmgweb_packages.views.core_team import * 
+from dmgweb_packages.views.delete_package import * 
 from dmgweb_packages.views.github import * 
 from dmgweb_packages.views.icons import * 
 from dmgweb_packages.views.packages import * 
