@@ -312,13 +312,14 @@ class SubmissionList():
         except:
             raise error("Unable to save the submission list : {0}".format(traceback.format_exc()))
     
-    def validate(self, type, name, version, user):
+    def validate(self, type, name, version, category, user):
         """ Validate a package :
             - add it in the packages list
             - delete it from the submission list
         """
         pkg_list = PackagesList()
         pkg = self.get_package(type, name, version)
+        pkg['category'] = category
         pkg['validation_date'] = time.time()
         pkg['validation_by'] = user
         pkg_list.add(pkg)
