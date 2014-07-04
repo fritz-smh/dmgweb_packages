@@ -123,29 +123,54 @@
           </div>
 
 
-
-
-          <div id="modal_install_{{ item.type }}_{{ item.name }}_{{ item.version|replace(".", "_") }}" class="modal fade">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                  <h4 class="modal-title" id="myModalLabel">Install the package</h4>
-                </div>
-                <div class="modal-body">
-                  <h3>Instructions</h3>
-                    <p>
-                      Just execute the given command line in a terminal as the domogik user.
-                    </p>
-                  <h3>Command line</h3>
-                    <pre>dmg_package --install {{ item.url_package }}</pre>
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          {% if view == "submission_list" and g.core_team %}
+            <div id="modal_install_{{ item.type }}_{{ item.name }}_{{ item.version|replace(".", "_") }}" class="modal fade">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">Install the package</h4>
+                  </div>
+                  <div class="modal-body">
+                    <h3>Instructions</h3>
+                      <p>
+                        Just execute the given command line in a terminal as the domogik user.
+                      </p>
+                    <h3>Command line</h3>
+                      <pre>dmg_package --install {{ item.url_package }}</pre>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+  
+            <div id="modal_refused_{{ item.type }}_{{ item.name }}_{{ item.version|replace(".", "_") }}" class="modal fade">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <form method="post" action="{{ url_for("refuse_package") }}">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                      <h4 class="modal-title" id="myModalLabel">Refuse a package</h4>
+                    </div>
+                    <div class="modal-body">
+                      <input name="type" type="hidden" value="{{ item.type }}">
+                      <input name="name" type="hidden" value="{{ item.name }}">
+                      <input name="version" type="hidden" value="{{ item.version }}">
+                      <p><label class="control-label">Give a reason to refuse the package :</label></p>
+                      <textarea class="" name="reason" rows="4" placeholder="The reason..."></textarea>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                      <button type="submit" class="btn btn-primary" href="{{ url_for("refuse_package") }}?type={{ item.type }}&name={{ item.name }}&version={{ item.version }}&reason=foobar">Refuse the package</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+
 
           <div id="modal_details_{{ item.type }}_{{ item.name }}_{{ item.version|replace(".", "_") }}" class="modal fade">
             <div class="modal-dialog">
@@ -171,57 +196,35 @@
             </div>
           </div>
                 
-          <div id="modal_refused_{{ item.type }}_{{ item.name }}_{{ item.version|replace(".", "_") }}" class="modal fade">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <form method="post" action="{{ url_for("refuse_package") }}">
-                  <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="myModalLabel">Refuse a package</h4>
-                  </div>
-                  <div class="modal-body">
-                    <input name="type" type="hidden" value="{{ item.type }}">
-                    <input name="name" type="hidden" value="{{ item.name }}">
-                    <input name="version" type="hidden" value="{{ item.version }}">
-                    <p><label class="control-label">Give a reason to refuse the package :</label></p>
-                    <textarea class="" name="reason" rows="4" placeholder="The reason..."></textarea>
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary" href="{{ url_for("refuse_package") }}?type={{ item.type }}&name={{ item.name }}&version={{ item.version }}&reason=foobar">Refuse the package</button>
-                  </div>
-                </form>
+          {% if view == "packages_list" and g.core_team %}
+            <div id="modal_category_{{ item.type }}_{{ item.name }}_{{ item.version|replace(".", "_") }}" class="modal fade">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <form method="post" action="{{ url_for("change_category") }}">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                      <h4 class="modal-title" id="myModalLabel">Package category</h4>
+                    </div>
+                    <div class="modal-body">
+                      <input name="type" type="hidden" value="{{ item.type }}">
+                      <input name="name" type="hidden" value="{{ item.name }}">
+                      <input name="version" type="hidden" value="{{ item.version }}">
+                      <p><label class="control-label">Set the package category to </label></p>
+                      <select id="category" name="category">
+                        {% for category in categories %}
+                          <option value="{{ category.id }}" {% if item.category == category.id %} selected {% endif %}>{{ category.name }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                      <button type="submit" class="btn btn-primary" href="{{ url_for("change_category") }}">Change the category</button>
+                    </div>
+                  </form>
+                </div>
               </div>
             </div>
-          </div>
-                
-          <div id="modal_category_{{ item.type }}_{{ item.name }}_{{ item.version|replace(".", "_") }}" class="modal fade">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <form method="post" action="{{ url_for("change_category") }}">
-                  <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="myModalLabel">Package category</h4>
-                  </div>
-                  <div class="modal-body">
-                    <input name="type" type="hidden" value="{{ item.type }}">
-                    <input name="name" type="hidden" value="{{ item.name }}">
-                    <input name="version" type="hidden" value="{{ item.version }}">
-                    <p><label class="control-label">Set the package category to </label></p>
-                    <select id="category" name="category">
-                      {% for category in categories %}
-                        <option value="{{ category.id }}">{{ category.name }}</option>
-                      {% endfor %}
-                    </select>
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary" href="{{ url_for("change_category") }}">Change the category</button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
+          {% endif %}
                 
         </section>
       {% endfor %}
