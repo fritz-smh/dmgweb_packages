@@ -52,7 +52,7 @@
            
             <!-- column 1 -->
             <div class="col-md-8">
-              <h2><img src="/static/images/category-{{ item.category }}.png" alt="{{ item.category }}"/> {{ item.type }} - {{ item.name }} - <span class="version">version {{ item.version }}</span></h2>
+              <h2>{{ item.type }} - {{ item.name }} - <span class="version">version {{ item.version }}</span> <img src="/static/images/category-{{ item.category }}.png" alt="{{ item.category }}"/></h2>
             </div>
 
 
@@ -109,6 +109,10 @@
                   {% if item.url_build_status %} <img class="build" src='{{ item.url_build_status }}'/> {% endif %}
                 </div>
                 <div class="right">
+                  {% if view == "packages_list" and g.core_team %}
+                    <a class="btn btn-warning"  data-toggle="modal" data-target="#modal_category_{{ item.type }}_{{ item.name }}_{{ item.version|replace(".", "_") }}" href="#">Category</a>
+                  {% endif %}
+
                   {% if view == "submission_list" and g.core_team %}
                     <a class="btn btn-warning" href="{{ url_for("validate_package") }}?type={{ item.type }}&name={{ item.name }}&version={{ item.version }}">Validate</a>
                     <a class="btn btn-warning" data-toggle="modal" data-target="#modal_refused_{{ item.type }}_{{ item.name }}_{{ item.version|replace(".", "_") }}" href="#">Refuse</a>
@@ -185,6 +189,34 @@
                   <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                     <button type="submit" class="btn btn-primary" href="{{ url_for("refuse_package") }}?type={{ item.type }}&name={{ item.name }}&version={{ item.version }}&reason=foobar">Refuse the package</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+                
+          <div id="modal_category_{{ item.type }}_{{ item.name }}_{{ item.version|replace(".", "_") }}" class="modal fade">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <form method="post" action="{{ url_for("change_category") }}">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">Package category</h4>
+                  </div>
+                  <div class="modal-body">
+                    <input name="type" type="hidden" value="{{ item.type }}">
+                    <input name="name" type="hidden" value="{{ item.name }}">
+                    <input name="version" type="hidden" value="{{ item.version }}">
+                    <p><label class="control-label">Set the package category to </label></p>
+                    <select id="category" name="category">
+                      {% for category in categories %}
+                        <option value="{{ category.id }}">{{ category.name }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" href="{{ url_for("change_category") }}">Change the category</button>
                   </div>
                 </form>
               </div>

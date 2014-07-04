@@ -12,7 +12,7 @@ from dmgweb_packages.common.package import PackageChecker, SubmissionList, Submi
 import traceback
 
 
-@app.route('/refuse_package', methods=('POST', 'PUT'))
+@app.route('/refuse_package', methods=['POST'])
 @login_required
 @core_team_required
 def refuse_package():

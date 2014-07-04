@@ -46,7 +46,7 @@ class FormSubmitPackage(Form):
 
 
 
-@app.route('/submit_package', methods=('GET', 'POST'))
+@app.route('/submit_package', methods=['GET', 'POST'])
 @login_required
 def submit_package():
     # TODO : reactivate CSRF !!!!

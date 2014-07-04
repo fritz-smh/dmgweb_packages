@@ -228,6 +228,18 @@ class PackagesList():
         except:
             raise error("Unable to save the packages list : {0}".format(traceback.format_exc()))
     
+    def set_category(self, type, name, version, category):
+        """ change the category of a package from the submission list
+        """
+        try:
+            self.json_buf = []
+            for pkg in self.json:
+               if pkg["type"] == type and pkg["name"] == name and  pkg["version"] == version:
+                   pkg["category"] = category
+            self.save()
+        except:
+            raise error("Unable to change the categery for the packages list : {0}".format(traceback.format_exc()))
+
 
 
 
