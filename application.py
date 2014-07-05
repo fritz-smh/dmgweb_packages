@@ -37,8 +37,8 @@ import logging
 ##### Global vars
 
 DOMOGIK_ORGANISATION = "Domogik"
-#LOG_FOLDER = "./logs/"
-LOG_FOLDER = "/tmp/"
+LOG_FOLDER = "./logs/"
+#LOG_FOLDER = "/tmp/"
 
 
 ##### Flask-Github related actions 
@@ -149,7 +149,7 @@ from dmgweb_packages.views.validate_package import *
 ### main
 if __name__ == '__main__':
     # logging
-    logging.basicConfig(filename='{0}/dmgweb_package.log'.format(LOG_FOLDER), level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s')
+    logging.basicConfig(filename='{0}/dmgweb_package.log'.format(LOG_FOLDER), level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
     logging.info('Starting!')
     print("Starting! Logs are in '{0}/dmgweb_package.log'".format(LOG_FOLDER))
 

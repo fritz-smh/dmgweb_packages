@@ -10,14 +10,14 @@ from dmgweb_packages.application import app, github, login_required, core_team_r
 from dmgweb_packages.common.package import PackageChecker, SubmissionList, SubmissionError
 
 import traceback
+import logging
 
 
 @app.route('/refuse_package', methods=['POST'])
 @login_required
 @core_team_required
 def refuse_package():
-    print request.method
-    print request.form
+    logging.info("Refuse the package {0}_{1} in version {2} for the reason : {3}".format(request.form["type"], request.form["name"], request.form["version"], request.form["reason"]))
     try:
         sub_list = SubmissionList()
         sub_list.refuse(request.form["type"], request.form["name"], request.form["version"], g.username, request.form["reason"])

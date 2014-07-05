@@ -10,14 +10,14 @@ from dmgweb_packages.application import app, github, login_required, core_team_r
 from dmgweb_packages.common.package import PackagesList, PackagesListError
 
 import traceback
+import logging
 
 
 @app.route('/change_category', methods=['POST'])
 @login_required
 @core_team_required
 def change_category():
-    print("Change the category!")
-    print(request.form)
+    logging.info("Change category for {0}_{1} in version {2} to {3}".format(request.form["type"], request.form["name"], request.form["version"], request.form["category"]))
     try:
         pkg_list = PackagesList()
         pkg_list.set_category(request.form["type"], request.form["name"], request.form["version"], request.form["category"])

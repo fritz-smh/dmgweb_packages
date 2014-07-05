@@ -10,14 +10,14 @@ from dmgweb_packages.application import app, github, login_required, core_team_r
 from dmgweb_packages.common.package import PackagesList, PackagesListError
 
 import traceback
+import logging
 
 
 @app.route('/delete_package', methods=['POST'])
 @login_required
 @core_team_required
 def delete_package():
-    print("Delete!")
-    print(request.form)
+    logging.info("Delete the package {0}_{1} in version {2}".format(request.form["type"], request.form["name"], request.form["version"]))
     try:
         pkg_list = PackagesList()
         pkg_list.delete(request.form["type"], request.form["name"], request.form["version"])

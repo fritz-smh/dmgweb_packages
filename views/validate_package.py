@@ -10,14 +10,14 @@ from dmgweb_packages.application import app, github, login_required, core_team_r
 from dmgweb_packages.common.package import PackageChecker, SubmissionList, SubmissionError
 
 import traceback
+import logging
 
 
 @app.route('/validate_package', methods=['POST'])
 @login_required
 @core_team_required
 def validate_package():
-    print("Validate!")
-    print(request.form)
+    logging.info("Validate the package {0}_{1} in version {2} for category {3} by {4}".format(request.form["type"], request.form["name"], request.form["version"], request.form["category"], g.username))
     try:
         sub_list = SubmissionList()
         sub_list.validate(request.form["type"], request.form["name"], request.form["version"], request.form["category"], g.username)

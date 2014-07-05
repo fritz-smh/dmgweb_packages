@@ -19,6 +19,7 @@ import tempfile
 import magic
 import zipfile
 import time
+import logging
 
 
 
@@ -83,7 +84,6 @@ def submit_package():
                     form.author.data       = the_package.get_json()['identity']['author']
                     form.author_email.data = the_package.get_json()['identity']['author_email']
                     form.hash_sha256.data = the_package.get_json()['hash_sha256']
-                    print form.hash_sha256.data
                     # submitter
                     # remarks
                 except:

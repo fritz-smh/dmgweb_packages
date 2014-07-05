@@ -154,7 +154,6 @@ class PackageChecker():
             # extract the package icon
             logging.info("PackageChecker : content of the zip file :")
             for member in myzip.namelist():
-                print(member)
                 logging.info(member)
             source = myzip.open(os.path.join(root_dir, ICON_FILE))
             target = file(os.path.join(ICONS_DIR, "{0}_{1}_{2}.png".format(self.json_data['identity']['type'], self.json_data['identity']['name'], self.json_data['identity']['version'])), "wb")
@@ -194,7 +193,6 @@ class PackagesList():
             self.json = json.load(open(PACKAGES_LIST))
         else:
             self.json = []
-        print("Packages : {0}".format(self.json))
         pass
 
     def list(self):
@@ -205,6 +203,7 @@ class PackagesList():
     def add(self, data):
         """ add a package to the submission list
         """
+        logging.info("New package : {0}_{1} in version {2}".format(data["type"], data["name"], data["version"]))
         # check unicity
         for pkg in self.json:
            if pkg["type"] == data["type"] and pkg["name"] == data["name"] and  pkg["version"] == data["version"]:
@@ -217,6 +216,7 @@ class PackagesList():
     def delete(self, type, name, version):
         """ delete a package from the submission list
         """
+        logging.info("Delete package : {0}_{1} in version {2}".format(data["type"], data["name"], data["version"]))
         # Keep all packages excepting the one
         try:
             self.json_buf = []
@@ -270,7 +270,6 @@ class SubmissionList():
                     pkg['tags'] = pkg['tags'].split(",")
         else:
             self.json = []
-        print("Submission list : {0}".format(self.json))
 
     def list(self):
         """ Return the list of submitted packages
@@ -280,19 +279,20 @@ class SubmissionList():
     def add(self, data):
         """ add a package to the submission list
         """
+        logging.info("Add a package in the submission list : {0}_{1} in version {2}".format(data["type"], data["name"], data["version"]))
         # check unicity
         for pkg in self.json:
            if pkg["type"] == data["type"] and pkg["name"] == data["name"] and  pkg["version"] == data["version"]:
                raise SubmissionError("This package has already been submitted by {0} (unique key is type/name/version)".format(pkg["submitter"]))
                return
         # add in the list
-        print("DATA : {0}".format(data))
         self.json.append(data)
         self.save()
 
     def delete(self, type, name, version):
         """ delete a package from the submission list
         """
+        logging.info("Delete a package from the submission list : {0}_{1} in version {2}".format(type, name, version))
         # Keep all packages excepting the one
         try:
             self.json_buf = []
@@ -328,6 +328,7 @@ class SubmissionList():
             - add it in the packages list
             - delete it from the submission list
         """
+        logging.info("Validate a package from the submission list : {0}_{1} in version {2}".format(data["type"], data["name"], data["version"]))
         pkg_list = PackagesList()
         pkg = self.get_package(type, name, version)
         pkg['category'] = category
@@ -341,6 +342,7 @@ class SubmissionList():
             - add it in the refused packages list
             - delete it from the submission list
         """
+        logging.info("Refuse a package in the submission list : {0}_{1} in version {2}".format(type, name, version))
         pkg_list = RefusedList()
         pkg = self.get_package(type, name, version)
         pkg['refused_date'] = time.time()
@@ -362,7 +364,6 @@ class RefusedList():
             self.json = json.load(open(REFUSED_PACKAGES_LIST))
         else:
             self.json = []
-        print("Refused packages : {0}".format(self.json))
         pass
 
     def list(self):
@@ -373,6 +374,7 @@ class RefusedList():
     def add(self, data):
         """ add a package to the refused list
         """
+        logging.info("Add a package in the refused list : {0}_{1} in version {2}".format(data["type"], data["name"], data["version"]))
         # we do not make any check about unicity here... this is just an history
         # add in the list
         self.json.append(data)
