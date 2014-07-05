@@ -32,10 +32,13 @@ from sqlalchemy.ext.declarative import declarative_base
 
 from dmgweb_packages.common.auth import is_core_team_member
 from functools import wraps
+import logging
 
 ##### Global vars
 
 DOMOGIK_ORGANISATION = "Domogik"
+#LOG_FOLDER = "./logs/"
+LOG_FOLDER = "/tmp/"
 
 
 ##### Flask-Github related actions 
@@ -91,8 +94,9 @@ class User(Base):
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        print("Login required | g.user = {0}".format(g.user))
+        logging.debug("Login required for this url. g.user = {0}".format(g.user))
         if g.user is None:
+            logging.debug("Redirect to the login url")
             return redirect(url_for('login', next=request.url))
         return f(*args, **kwargs)
     return decorated_function
@@ -100,8 +104,9 @@ def login_required(f):
 def core_team_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        print("G={0}".format(g.core_team))
+        logging.debug("Core team member required for this url.g.core_team = {0}".format(g.core_team))
         if not g.core_team:
+            logging.warning("Access denied to this url (core team only). Redirect to the index url")
             flash("Access denied !")
             return redirect(url_for('index'))
         return f(*args, **kwargs)
@@ -143,6 +148,11 @@ from dmgweb_packages.views.validate_package import *
 
 ### main
 if __name__ == '__main__':
+    # logging
+    logging.basicConfig(filename='{0}/dmgweb_package.log'.format(LOG_FOLDER), level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s')
+    logging.info('Starting!')
+    print("Starting! Logs are in '{0}/dmgweb_package.log'".format(LOG_FOLDER))
+
     init_db()
     app.run(debug=True, host = "192.168.1.10", port = 80)
 

@@ -1,5 +1,6 @@
 import json
 import os
+import logging
 
 CONFIG_FILE = "config.json"
 
@@ -26,7 +27,6 @@ class Categories():
             self.json = tmp_json['categories']
         else:
            raise CategoriesError("Categories : unable to open or read file '{0}')".format(CONFIG_FILE))
-        print("Categories : {0}".format(self.json))
         pass
 
     def list(self):

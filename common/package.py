@@ -9,6 +9,7 @@ import zipfile
 import time
 import shutil
 import hashlib
+import logging
 
 
 
@@ -70,19 +71,19 @@ class PackageChecker():
         self.url = url
         self.downloaded_file = None
         self.json_data = None
+        logging.info("PackageChecker for {0}".format(url))
 
     def download(self):
         """ Download the package to a temporary path for analysis
         """
         # check if this is an url
         if not URL_REGEXP.search(self.url):
+            logging.warning("PackageChecker : '{0}' is not a valid url".format(self.url))
             return False, "{0} is not a valid url".format(self.url)
-
 
         try:
 
-            #response = requests.get(self.url)
-
+            logging.info("PackageChecker : start downloading...")
             # create an empty temporary file
             self.downloaded_file = tempfile.NamedTemporaryFile(delete = False).name
 
@@ -104,7 +105,10 @@ class PackageChecker():
                 # TODO : stream mode and visuel feedback ???, see package.py in domogik for the example
                 f.write(response.content)
 
+            logging.info("PackageChecker : download finished in '{0}'".format(self.downloaded_file))
+
         except: 
+            logging.warning("PackageChecker : download error for '{0}' : {1}".format(self.downloaded_file, traceback.format_exc()))
             return False, "Error while downloading the package : {0}".format(traceback.format_exc())
         return True, None
 
@@ -112,40 +116,46 @@ class PackageChecker():
     def get_info_json(self):
         """ Get the info.json file from the zip
         """
+        logging.info("PackageChecker : get informations for the package....")
         # get the hash of the file to check it has not change
         hash_sha256 = hashlib.sha256(open(self.downloaded_file, 'rb').read()).hexdigest()
-        print hash_sha256 
+        logging.info("PackageChecker : hash (sha256) = {0}".format(hash_sha256))
         
         # check the zip file contains what we need
         with zipfile.ZipFile(self.downloaded_file, 'r') as myzip:
             # test the zip file
             testzip = myzip.testzip()
             if testzip != None:
+                logging.warning("PackageChecker : The zip seems not to be good for the file : {0}".format(testzip))
                 return False, "The zip seems not to be good for the file : {0}".format(testzip)
           
 
             # security!!!!! check if there is no .. or / in files path
             for fic in myzip.namelist():
                 if fic[0:1] == "/" or fic[0:2] == "..":
+                    logging.warning("PackageChecker : Security issue ! The zip contains some files with a path starting by '/' or '..'")
                     return False, "Security issue ! The zip contains some files with a path starting by '/' or '..'"
 
             # we assume that the first item of the list is the master directory in the zip and so the info.json file is under it
             try:
                 root_dir = myzip.namelist()[0]
             except:
+                logging.warning("PackageChecker : Error while looking in the zip file : {0}".format(traceback.format_exc()))
                 return False, "Error while looking in the zip file : {0}".format(traceback.format_exc())
             json_file = os.path.join(root_dir, JSON_FILE)
             try:
                 fp_json = myzip.open(json_file, 'r')
             except KeyError:
+                logging.warning("PackageChecker : There is no file named '{0}' in this zip archive!".format(json_file))
                 return False, "There is no file named '{0}' in this zip archive!".format(json_file)
             self.json_data = json.load(fp_json)
             self.json_data["hash_sha256"] = hash_sha256
-            print self.json_data
 
             # extract the package icon
+            logging.info("PackageChecker : content of the zip file :")
             for member in myzip.namelist():
-                print member
+                print(member)
+                logging.info(member)
             source = myzip.open(os.path.join(root_dir, ICON_FILE))
             target = file(os.path.join(ICONS_DIR, "{0}_{1}_{2}.png".format(self.json_data['identity']['type'], self.json_data['identity']['name'], self.json_data['identity']['version'])), "wb")
             with source, target:
@@ -164,10 +174,11 @@ class PackageChecker():
     def delete_downloaded_file(self):
         """ Delete the temporary file
         """
+        logging.info("PackageChecker : delete the temporary file '{0}'".format(self.downloaded_file))
         try:
             os.unlink(self.downloaded_file)
         except:
-            print("ERROR : unable to delete {0}".format(self.downloaded_file))
+            logging.warning("PackageChecker : unable to delete {0}".format(self.downloaded_file))
             pass
 
 
