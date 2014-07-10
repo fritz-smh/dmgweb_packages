@@ -6,7 +6,7 @@ from flask_wtf import Form
 from wtforms import TextField, HiddenField
 from wtforms.validators import DataRequired
 
-from dmgweb_packages.application import app, github, login_required, core_team_required
+from dmgweb_packages.application import app, login_required, core_team_required, github
 from dmgweb_packages.common.package import PackagesList, PackagesListError
 
 import traceback

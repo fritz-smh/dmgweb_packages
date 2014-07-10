@@ -1,7 +1,7 @@
 # Flask common imports
 from flask import Flask, request, g, session, redirect, url_for, flash
 from flask import render_template, render_template_string
-from dmgweb_packages.application import app, github
+from dmgweb_packages.application import app#, github
 from dmgweb_packages.common.package import PACKAGES_LIST, RefusedList, RefusedError
 import json
 import os

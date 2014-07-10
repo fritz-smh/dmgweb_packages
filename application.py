@@ -6,6 +6,12 @@
 
 """
 
+import sys
+
+if len(sys.argv) > 1 and sys.argv[1] == "build":
+    BUILD = True
+else:
+    BUILD = False
 
 # Flask common imports
 from flask import Flask, request, g, session, redirect, url_for
@@ -13,7 +19,10 @@ from flask import render_template, render_template_string
 
 
 # Flask-Github for Oauth with Github
-from flask.ext.github import GitHub
+if not BUILD:
+    from flask.ext.github import GitHub
+else:
+    from flask_frozen import Freezer
 
 # Flask-bootstrap
 from flask_bootstrap import Bootstrap
@@ -30,7 +39,8 @@ from sqlalchemy.ext.declarative import declarative_base
 
 ##### common libs
 
-from dmgweb_packages.common.auth import is_core_team_member
+if not BUILD:
+    from dmgweb_packages.common.auth import is_core_team_member
 from functools import wraps
 import logging
 
@@ -58,7 +68,13 @@ app = Flask(__name__)
 app.config.from_object(__name__)
 
 # setup github-flask
-github = GitHub(app)
+if not BUILD:
+    github = GitHub(app)
+
+# setup Flask-frozen
+else:
+    app.config['FREEZER_RELATIVE_URLS'] = True
+    #freezer = Freezer(app)
 
 # setup sqlalchemy
 engine = create_engine(app.config['DATABASE_URI'])
@@ -117,13 +133,17 @@ def core_team_required(f):
 def before_request():
     g.user = None
     g.username = None
-    if 'user_id' in session:
-        # get user informations
-        g.user = User.query.get(session['user_id'])
-        g.username = github.get('user')['login']
-        # is the user member of the Domogik organisation ?
-        # True or False
-        g.core_team = is_core_team_member(github, DOMOGIK_ORGANISATION, g.username)
+    g.build = None
+    if not BUILD:
+        if 'user_id' in session:
+            # get user informations
+            g.user = User.query.get(session['user_id'])
+            g.username = github.get('user')['login']
+            # is the user member of the Domogik organisation ?
+            # True or False
+            g.core_team = is_core_team_member(github, DOMOGIK_ORGANISATION, g.username)
+    else:
+        g.build = True
 
 
 @app.after_request
@@ -131,20 +151,27 @@ def after_request(response):
     db_session.remove()
     return response
 
+
+
+
+
 ### Views
 from dmgweb_packages.views.index import * 
-from dmgweb_packages.views.change_category import * 
-from dmgweb_packages.views.core_team import * 
-from dmgweb_packages.views.delete_package import * 
-from dmgweb_packages.views.github import * 
-from dmgweb_packages.views.icons import * 
 from dmgweb_packages.views.packages import * 
-from dmgweb_packages.views.submit_package import * 
-from dmgweb_packages.views.refused_list import * 
 from dmgweb_packages.views.submission_list import * 
-from dmgweb_packages.views.user import * 
-from dmgweb_packages.views.refuse_package import * 
-from dmgweb_packages.views.validate_package import * 
+from dmgweb_packages.views.icons import * 
+
+if not BUILD:
+    from dmgweb_packages.views.change_category import * 
+    from dmgweb_packages.views.core_team import * 
+    from dmgweb_packages.views.delete_package import * 
+    from dmgweb_packages.views.github import * 
+    from dmgweb_packages.views.submit_package import * 
+    from dmgweb_packages.views.refused_list import * 
+    from dmgweb_packages.views.user import * 
+    from dmgweb_packages.views.refuse_package import * 
+    from dmgweb_packages.views.validate_package import * 
+
 
 ### main
 if __name__ == '__main__':
@@ -153,6 +180,17 @@ if __name__ == '__main__':
     logging.info('Starting!')
     print("Starting! Logs are in '{0}/dmgweb_package.log'".format(LOG_FOLDER))
 
-    init_db()
-    app.run(debug=True, host = "192.168.1.10", port = 80)
+    if not BUILD:
+        init_db()
+        app.run(debug=True, host = "192.168.1.10", port = 80)
+    else:
+        freezer = Freezer(app)
+
+        @freezer.register_generator
+        def icons_generator():
+            the_icons = next(os.walk('data/icons'))[2]
+            for an_icon in the_icons:
+               yield 'icons', {'filename': an_icon }
+
+        freezer.freeze()
 
