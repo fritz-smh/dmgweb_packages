@@ -39,6 +39,7 @@ from sqlalchemy.ext.declarative import declarative_base
 
 ##### common libs
 
+from dmgweb_packages.common.config import get_root_repository_url
 if not BUILD:
     from dmgweb_packages.common.auth import is_core_team_member
 from functools import wraps
@@ -144,6 +145,7 @@ def before_request():
             g.core_team = is_core_team_member(github, DOMOGIK_ORGANISATION, g.username)
     else:
         g.build = True
+        g.root_repository_url = get_root_repository_url()
 
 
 @app.after_request
@@ -167,9 +169,9 @@ if not BUILD:
     from dmgweb_packages.views.core_team import * 
     from dmgweb_packages.views.delete_package import * 
     from dmgweb_packages.views.github import * 
-    from dmgweb_packages.views.submit_package import * 
     from dmgweb_packages.views.refused_list import * 
     from dmgweb_packages.views.user import * 
+    from dmgweb_packages.views.submit_package import * 
     from dmgweb_packages.views.refuse_package import * 
     from dmgweb_packages.views.validate_package import * 
 

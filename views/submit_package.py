@@ -49,7 +49,6 @@ class FormSubmitPackage(Form):
     category = SelectField('category', choices=categories.list_for_wtf())
 
 
-
 @app.route('/submit_package', methods=['GET', 'POST'])
 @login_required
 def submit_package():

@@ -8,7 +8,7 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="index">Domogik packages</a>
+      <a class="navbar-brand" href="/">Domogik packages</a>
     </div>
 
     <!-- Collect the nav links, forms, and other content for toggling -->
@@ -23,6 +23,9 @@
         <li>
           <a href="{{ url_for("dashboard") }}"><span class='glyphicon glyphicon-dashboard' aria-hidden='true'></span> Dashboard</a>
         </li>
+        {% if g.build %}
+          <a href="{{ g.root_repository_url }}"><span class='glyphicon glyphicon-plus' aria-hidden='true'></span> Submit a package</a>
+        {% endif %}
         {% if g.username %}
           <li>
             <a href="{{ url_for("submit_package") }}"><span class='glyphicon glyphicon-plus' aria-hidden='true'></span> Submit a package</a>

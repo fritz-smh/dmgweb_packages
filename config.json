@@ -1,4 +1,5 @@
 {
+  "root_repository" : "http://repo-dev.domogik.org/",
   "categories" : 
     [
       { "id" : "nightly",    "name" : "Nightly",  "is_nightly" : true,  "is_obsolete" : false },
