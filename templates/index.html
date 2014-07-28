@@ -2,7 +2,20 @@
 
 {% block content %}
 <div class="container">
-  <h1>Hello, world!</h1>
+  <h1>Welcome on the <a href="http://www.domogik.org">Domogik</a> packages repository!</h1>
+  <p>
+    This packages repository is similar as a store or market for smartphones. You will find all the packages for Domogik, a home automation system which is free and open source. 
+  </p>
+  <p>
+    <a href="/packages">Go and search for packages!</a>
+  </p>
+
+  {% if not g.build %}
+    <h1>Create a mirror for this website!</h1>
+    <p>
+      You can create mirrors for this website. To do this, just <a href="/mirror.tgz">download the last mirror archive</a> and check in <a href="https://github.com/fritz-smh/dmgweb_packages/blob/master/README.md">the documentation</a> how to deploy it. This is really simple!
+    </p>
+  {% endif %}
 
 
 </div>

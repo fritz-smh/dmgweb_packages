@@ -1,8 +1,8 @@
 import json
 import os
 
-
-CONFIG_FILE = "config.json"
+PWD = os.path.dirname(os.path.realpath(__file__))
+CONFIG_FILE = "{0}/../config.json".format(PWD)
 
 def get_root_repository_url():
     ### load the json
@@ -11,7 +11,7 @@ def get_root_repository_url():
         tmp_json = json.load(open(CONFIG_FILE))
         return tmp_json['root_repository']
     else:
-        raise error("Categories : unable to open or read file '{0}')".format(CONFIG_FILE))
+        raise Exception("Categories : unable to open or read file '{0}')".format(CONFIG_FILE))
     pass
 
     

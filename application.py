@@ -1,9 +1,6 @@
 """
-    GitHub Example
-    --------------
-
-    Shows how to authorize users with Github.
-
+dmgweb_packages
+A repository to host domogik packages
 """
 
 import sys
@@ -41,28 +38,28 @@ from sqlalchemy.ext.declarative import declarative_base
 
 from dmgweb_packages.common.config import get_root_repository_url
 if not BUILD:
-    from dmgweb_packages.common.auth import is_core_team_member
+    from dmgweb_packages.common.auth import is_core_team_member, get_github_oauth_data
 from functools import wraps
 import logging
+import os
 
 ##### Global vars
 
+PWD = os.path.dirname(os.path.realpath(__file__))
 DOMOGIK_ORGANISATION = "Domogik"
-LOG_FOLDER = "./logs/"
-#LOG_FOLDER = "/tmp/"
+LOG_FOLDER = "{0}/logs/".format(PWD)
 
 
 ##### Flask-Github related actions 
 
 # Database configuration for Oauth (and so github)
-DATABASE_URI = 'sqlite:////tmp/github-flask.db'
+DATABASE_URI = 'sqlite:////{0}/github-flask.db'.format(PWD)
 SECRET_KEY = 'development key'
 DEBUG = True
 
 # Set these values
-GITHUB_CLIENT_ID = 'b3c8577a5e9a648cfebd'
-GITHUB_CLIENT_SECRET = '05a933b4572b24bd0621b62820674a076dd12ca7'
-GITHUB_CALLBACK_URL = 'http://les-cours-du-chaos.hd.free.fr/github-callback'
+if not BUILD:
+    GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_CALLBACK_URL = get_github_oauth_data()
 
 # setup flask
 app = Flask(__name__)
@@ -75,7 +72,7 @@ if not BUILD:
 # setup Flask-frozen
 else:
     app.config['FREEZER_RELATIVE_URLS'] = True
-    #freezer = Freezer(app)
+    app.config['FREEZER_DESTINATION'] = 'mirror'
 
 # setup sqlalchemy
 engine = create_engine(app.config['DATABASE_URI'])
@@ -162,6 +159,7 @@ from dmgweb_packages.views.index import *
 from dmgweb_packages.views.packages import * 
 from dmgweb_packages.views.submission_list import * 
 from dmgweb_packages.views.icons import * 
+from dmgweb_packages.views.mirror import * 
 from dmgweb_packages.views.dashboard import * 
 
 if not BUILD:
@@ -191,7 +189,7 @@ if __name__ == '__main__':
 
         @freezer.register_generator
         def icons_generator():
-            the_icons = next(os.walk('data/icons'))[2]
+            the_icons = next(os.walk('{0}/data/icons'.format(PWD)))[2]
             for an_icon in the_icons:
                yield 'icons', {'filename': an_icon }
 

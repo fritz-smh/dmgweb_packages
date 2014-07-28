@@ -19,9 +19,11 @@ import logging
 JSON_FILE = "info.json"
 ICON_FILE = "design/icon.png"
 ICONS_DIR = "data/icons/"
-PACKAGES_LIST = "data/packages.json"
-SUBMITTED_PACKAGES_LIST = "data/submitted_packages.json"
-REFUSED_PACKAGES_LIST = "data/refused_packages.json"
+
+PWD = os.path.dirname(os.path.realpath(__file__))
+PACKAGES_LIST = "{0}/../data/packages.json".format(PWD)
+SUBMITTED_PACKAGES_LIST = "{0}/data/submitted_packages.json".format(PWD)
+REFUSED_PACKAGES_LIST = "{0}/data/refused_packages.json".format(PWD)
 
 
 # allowed mime types for packages download

@@ -1,4 +1,10 @@
 {
+  "github" : 
+    {
+      "client_id" : "b3c8577a5e9a648cfebd",
+      "client_secret" : "05a933b4572b24bd0621b62820674a076dd12ca7",
+      "callback_url" : "http://les-cours-du-chaos.hd.free.fr/github-callback"
+    },
   "root_repository" : "http://repo-dev.domogik.org/",
   "categories" : 
     [
