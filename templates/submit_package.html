@@ -35,6 +35,11 @@
         <label class="control-label">Build status :</label> {% if step == 2 %}<img src="{{ form.url_build_status.data }}"/> {% endif %} {{ form.url_build_status }}
       </div>
     {% endif %}
+    {% if step == 1 or form.url_doc.data %}
+      <div class="form-group ">
+        <label class="control-label">Documentation :</label> {{ form.url_doc }}
+      </div>
+    {% endif %}
     {% if step == 2 %}
     <div class="form-group ">
       <label class="control-label">Package :</label> {{ form.package.data }}
@@ -60,9 +65,11 @@
       <label class="control-label">Tags :</label> {{ form.tags.data }}
       {{ form.tags }}
     </div>
+    {{ form.json_version }}
+    {{ form.domogik_min_version }}
     {{ form.hash_sha256 }}
     {% endif %}
-    <input type="submit" value="Validate">
+    <input type="submit" value="Validate" class="btn btn-primary">
   </form>
   {% endif %}
 

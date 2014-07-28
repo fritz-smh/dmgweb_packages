@@ -328,7 +328,7 @@ class SubmissionList():
             - add it in the packages list
             - delete it from the submission list
         """
-        logging.info("Validate a package from the submission list : {0}_{1} in version {2}".format(data["type"], data["name"], data["version"]))
+        logging.info("Validate a package from the submission list : {0}_{1} in version {2}".format(type, name, version))
         pkg_list = PackagesList()
         pkg = self.get_package(type, name, version)
         pkg['category'] = category

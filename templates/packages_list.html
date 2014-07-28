@@ -105,6 +105,9 @@
             <div class="col-md-4">
               <div>
                 <div class="right">
+                  {% if item.url_doc %}
+                    <a class="btn btn-primary" href="{{ item.url_doc }}" ><span class='glyphicon glyphicon-book' aria-hidden='true'></span> Documentation</a>
+                  {% endif %}
                   <a class="btn btn-default" data-toggle="modal" data-target="#modal_details_{{ item.type }}_{{ item.name }}_{{ item.version|replace(".", "_") }}" href="#" >More details</a>
                 </div>
                 <div class="build right">
@@ -218,6 +221,8 @@
                     {% if item.validation_by %}
                       <li>Validated by : {{ item.validation_by }} on {{ item.validation_date }}</li>
                     {% endif %}
+                    <li>Json format version : {{ item.json_version }}</li>
+                    <li>Domogik minimal version required : {{ item.domogik_min_version }}</li>
                   </ul>
                 </div>
                 <div class="modal-footer">

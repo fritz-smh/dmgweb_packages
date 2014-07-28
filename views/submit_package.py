@@ -33,6 +33,7 @@ class FormSubmitPackage(Form):
     # form
     url_package = TextField('url_package', validators=[DataRequired()])
     url_build_status = TextField('url_build_status')
+    url_doc = TextField('url_doc')
     package = HiddenField('package')
     type = HiddenField('type')
     name = HiddenField('name')
@@ -41,6 +42,8 @@ class FormSubmitPackage(Form):
     author = HiddenField('author')
     author_email = HiddenField('author_email')
     tags = HiddenField('tags')
+    json_version = HiddenField('json_version')
+    domogik_min_version = HiddenField('domogik_min_version')
     hash_sha256 = HiddenField('hash_sha256')
     step = HiddenField('step')
     category = SelectField('category', choices=categories.list_for_wtf())
@@ -74,16 +77,18 @@ def submit_package():
                 flash(message, "error")
             else:
                 try:
-                    form.step.data         = '2'
-                    form.version.data      = the_package.get_json()['identity']['version']
-                    form.type.data         = the_package.get_json()['identity']['type']
-                    form.name.data         = the_package.get_json()['identity']['name']
-                    form.package.data      = "{0}_{1}".format(form.type.data, form.name.data)
-                    form.description.data  = the_package.get_json()['identity']['description']
-                    form.tags.data         = ",".join(the_package.get_json()['identity']['tags'])
-                    form.author.data       = the_package.get_json()['identity']['author']
-                    form.author_email.data = the_package.get_json()['identity']['author_email']
-                    form.hash_sha256.data = the_package.get_json()['hash_sha256']
+                    form.step.data                = '2'
+                    form.version.data             = the_package.get_json()['identity']['version']
+                    form.type.data                = the_package.get_json()['identity']['type']
+                    form.name.data                = the_package.get_json()['identity']['name']
+                    form.package.data             = "{0}_{1}".format(form.type.data, form.name.data)
+                    form.description.data         = the_package.get_json()['identity']['description']
+                    form.tags.data                = ",".join(the_package.get_json()['identity']['tags'])
+                    form.author.data              = the_package.get_json()['identity']['author']
+                    form.author_email.data        = the_package.get_json()['identity']['author_email']
+                    form.hash_sha256.data         = the_package.get_json()['hash_sha256']
+                    form.json_version.data        = the_package.get_json()['json_version']
+                    form.domogik_min_version.data = the_package.get_json()['identity']['domogik_min_version']
                     # submitter
                     # remarks
                 except:
@@ -101,6 +106,7 @@ def submit_package():
         submitted_package = { "url_package" : form.url_package.data,
                               "category" : form.category.data,
                               "url_build_status" : form.url_build_status.data,
+                              "url_doc" : form.url_doc.data,
                               "package" : form.package.data,
                               "type" : form.type.data,
                               "name" : form.name.data,
@@ -110,6 +116,8 @@ def submit_package():
                               "author" : form.author.data,
                               "author_email" : form.author_email.data,
                               "hash_sha256" : form.hash_sha256.data,
+                              "json_version" : form.json_version.data,
+                              "domogik_min_version" : form.domogik_min_version.data,
                               "submitter" : g.username,
                               "submission_date" : time.time()
                             }
