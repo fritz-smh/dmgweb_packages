@@ -7,11 +7,11 @@ Domogik packages manager
 Installation
 ------------
 
-On a server, clone the repository: ::
+On a server, clone the repository: 
 
     git clone https://github.com/fritz-smh/dmgweb_packages.git
 
-Then, fill the configuration file *config.json* ::
+Then, fill the configuration file **config.json** 
 
 
     {
