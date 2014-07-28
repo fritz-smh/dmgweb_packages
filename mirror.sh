@@ -18,6 +18,10 @@ echo "Generate the static website..."
 export PYTHONPATH=$MIRROR_DIR/../
 python $PYTHONPATH/dmgweb_packages/application.py build
 
+echo "Do a copy of the json files just in case we loose the master ones..."
+mkdir -p $MIRROR_DIR/mirror/save_json/
+cp $MIRROR_DIR/data/*json $MIRROR_DIR/mirror/save_json/ 
+
 echo "Rename index.html as index..."
 mv $MIRROR_DIR/mirror/index.html $MIRROR_DIR/mirror/index
 
