@@ -1,0 +1,133 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+
+<div class="container">
+  <h1>Dashboard</h1>
+  <div class="jumbotron">
+    <p>
+      This dashboard is a condensed view to check the status of all the packages and also some other components.
+    </p>
+    <p>
+      If you want to install some packages, <a href="{{ url_for("packages") }}">go to the packages page</a>.
+    </p>
+  </div>
+
+  {% if error %}
+    <div class='error'>ERROR : {{ error }}</div>
+  {% endif %}
+
+  {% if pkg_list|length == 0 %}
+      <p>There is no packages.</p>
+  {% else %}
+
+    <div class="search input-group"> <span class="input-group-addon">Search</span>
+      <input id="filter" type="text" class="form-control" placeholder="Type your query here. Example : 'stable', 'nightly', 'computer', 'energy', ...">
+    </div>
+
+    <!-- row 1 -->
+    <div class="row">
+
+      <!-- column 1 -->
+      <div class="col-md-4">
+        <h2>Components</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Component</th>
+              <th>Build status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in components %}
+              <tr class="searchable"> 
+                <td>
+                  <strong>{{ item.label }}</strong>
+                </td>
+                <td class="pull-right">
+                  {% if item.url_build_status %} 
+                    <img class="build" src='{{ item.url_build_status }}'/> 
+                  {% else %}
+                    n/a
+                  {% endif %}
+                </td>
+              </tr> 
+            {% endfor %}
+          </tbody>
+        </table>
+      </div> <!-- column 1 -->
+
+      <!-- column 2 -->
+      <div class="col-md-4">
+        <h2>Validated packages</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Package</th>
+              <th>Category</th>
+              <th>Build status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in pkg_list %}
+              <tr class="searchable"> 
+                <td>
+                  <strong>{{ item.type }} - {{ item.name }} - version {{ item.version }}</strong>
+                </td>
+                <td>
+                  {{ item.category }}
+                </td>
+                <td class="pull-right">
+                  {% if item.url_build_status %} 
+                    <img class="build" src='{{ item.url_build_status }}'/> 
+                  {% else %}
+                    n/a
+                  {% endif %}
+                </td>
+              </tr> 
+            {% endfor %}
+          </tbody>
+        </table>
+      </div> <!-- column 2 -->
+
+      <!-- column 3 -->
+      <div class="col-md-4">
+        <h2>Submitted packages</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Package</th>
+              <th>Category</th>
+              <th>Build status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in sub_list %}
+              <tr class="searchable"> 
+                <td>
+                  <strong>{{ item.type }} - {{ item.name }} - version {{ item.version }}</strong>
+                </td>
+                <td>
+                  {{ item.category }}
+                </td>
+                <td class="pull-right">
+                  {% if item.url_build_status %} 
+                    <img class="build" src='{{ item.url_build_status }}'/> 
+                  {% else %}
+                    n/a
+                  {% endif %}
+                </td>
+              </tr> 
+            {% endfor %}
+          </tbody>
+        </table>
+      </div> <!-- column 3 -->
+
+    </div> <!-- row 1 -->
+ 
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}
+

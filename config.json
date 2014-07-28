@@ -1,9 +1,18 @@
 {
   "categories" : 
-     [
-       { "id" : "nightly",    "name" : "Nightly",  "is_nightly" : true,  "is_obsolete" : false },
-       { "id" : "stable",     "name" : "Stable",   "is_nightly" : false, "is_obsolete" : false },
-       { "id" : "oldstable",  "name" : "Obsolete", "is_nightly" : false, "is_obsolete" : true }
-     ]
+    [
+      { "id" : "nightly",    "name" : "Nightly",  "is_nightly" : true,  "is_obsolete" : false },
+      { "id" : "stable",     "name" : "Stable",   "is_nightly" : false, "is_obsolete" : false },
+      { "id" : "oldstable",  "name" : "Obsolete", "is_nightly" : false, "is_obsolete" : true }
+    ],
+  "dashboard" :
+    {
+      "components" : 
+        [
+          { "label" : "Domogik (master)",     "url_build_status" : "https://travis-ci.org/domogik/domogik.png?branch=master" },
+          { "label" : "Domogik (0.3)",        "url_build_status" : "https://travis-ci.org/domogik/domogik.png?branch=0.3" }
+        ]
+     
+    }
 }
 

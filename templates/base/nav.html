@@ -20,6 +20,9 @@
         <li>
           <a href="{{ url_for("submission_list") }}"><span class='glyphicon glyphicon-filter' aria-hidden='true'></span> Submitted packages</a>
         </li>
+        <li>
+          <a href="{{ url_for("dashboard") }}"><span class='glyphicon glyphicon-grid' aria-hidden='true'></span> Dashboard</a>
+        </li>
         {% if g.username %}
           <li>
             <a href="{{ url_for("submit_package") }}"><span class='glyphicon glyphicon-plus' aria-hidden='true'></span> Submit a package</a>

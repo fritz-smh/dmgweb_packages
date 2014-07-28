@@ -1,8 +1,7 @@
 import json
 import os
 import logging
-
-CONFIG_FILE = "config.json"
+from dmgweb_packages.common.config import CONFIG_FILE
 
 
 
