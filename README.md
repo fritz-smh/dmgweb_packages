@@ -85,6 +85,16 @@ This will create each night a file **data/mirror.tgz** which is a static version
 **Please notice that downloading the mirror.tgz file is also a backup action!** The *mirorr.sh* script include also in the tgz a copy of all the json files which contains the packages informations.
 
 
+Restore from the mirror.tgz backup
+----------------------------------
+
+* Install dmgweb_packages as usual
+* Extract the mirror.tgz somewhere
+* in *dmgweb_packages/data/icons* copy the content or *mirror/icons/*
+* in *dmgweb_packages/data/* copy the content or *mirror/save_json/*
+
+Restore is done !
+
 Deploy a mirror tgz on a web server (nginx)
 -------------------------------------------
 
