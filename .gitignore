@@ -52,6 +52,12 @@ coverage.xml
 # Sphinx documentation
 docs/_build/
 
-# domogik
+# dmgweb_packages
 data/
 data.sample/
+config.json
+TODO.txt
+github-flask.db
+github_tokens.txt
+nohup.out
+

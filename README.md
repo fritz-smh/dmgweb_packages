@@ -31,6 +31,10 @@ On the server, clone the repository:
 
     git clone https://github.com/fritz-smh/dmgweb_packages.git
 
+Create a configuration file:
+
+    cp examples/config.json.sample config.json
+
 Then, fill the configuration file **config.json** 
 
 
