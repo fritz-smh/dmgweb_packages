@@ -1,0 +1,34 @@
+#!/bin/bash
+# /etc/init.d/dmgweb_packages
+
+### BEGIN INIT INFO
+# Provides:          dmgweb_packages
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: dmgweb_packages init script
+# Description:       This service is used to run dmgweb_packages
+### END INIT INFO
+
+
+case "$1" in 
+    start)
+        echo "Starting dmgweb_packages"
+        export PYTHONPATH=___INSTALL_PATH___/
+        nohup python ___INSTALL_PATH___/dmgweb_packages/application.py &
+        # notice that a pid file will be created as ___INSTALL_PATH___/dmgweb_packages/logs/dmgweb_packages.pid
+        ;;
+    stop)
+	echo "Stopping dmgweb_packages"
+        kill $(cat ___INSTALL_PATH___/dmgweb_packages/logs/dmgweb_packages.pid)
+        rm -f ___INSTALL_PATH___/dmgweb_packages/logs/dmgweb_packages.pid
+        ;;
+    *)
+        echo "Usage: /etc/init.d/dmgweb_package start|stop"
+        exit 1
+        ;;
+esac
+
+exit 0
+

@@ -26,6 +26,7 @@ Install some prerequisites on the server:
     pip install Flask-Bootstrap
     pip install Frozen-Flask
 
+
 On the server, clone the repository: 
 
     git clone https://github.com/fritz-smh/dmgweb_packages.git
@@ -59,6 +60,14 @@ Then, fill the configuration file **config.json**
 
 
 TODO : continue :)
+
+
+
+
+Create an **init.d** file. From the *dmgweb_packages* folder, run :
+
+    sed "s#___INSTALL_PATH___#$PWD/#" examples/init.sample > /etc/init.d/dmgweb_packages
+    chmomd a+x /etc/init.d/dmgweb_packages
 
 
 Files and folders generated

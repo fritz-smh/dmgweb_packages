@@ -185,6 +185,10 @@ if not BUILD:
 
 ### main
 if __name__ == '__main__':
+    # first, write the pid in a file
+    with open("{0}/dmgweb_packages.pid".format(LOG_FOLDER), 'w') as pid_file:
+        pid_file.write(str(os.getpid()))
+
     # logging
     logging.basicConfig(filename='{0}/dmgweb_package.log'.format(LOG_FOLDER), level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
     logging.info('Starting!')
