@@ -36,7 +36,7 @@ from sqlalchemy.ext.declarative import declarative_base
 
 ##### common libs
 
-from dmgweb_packages.common.config import get_root_repository_url
+from dmgweb_packages.common.config import get_root_repository_url, get_server_ip, get_server_port
 if not BUILD:
     from dmgweb_packages.common.auth import is_core_team_member, get_github_oauth_data
 from functools import wraps
@@ -196,7 +196,8 @@ if __name__ == '__main__':
 
     if not BUILD:
         init_db()
-        app.run(debug=True, host = "192.168.1.10", port = 80)
+        #app.run(debug=True, host = "192.168.1.10", port = 80)
+        app.run(debug=True, host = get_server_ip(), port = get_server_port())
     else:
         freezer = Freezer(app)
 
