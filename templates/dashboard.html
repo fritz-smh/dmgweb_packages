@@ -17,116 +17,111 @@
     <div class='error'>ERROR : {{ error }}</div>
   {% endif %}
 
-  {% if pkg_list|length == 0 %}
-      <p>There is no packages.</p>
-  {% else %}
+  <!-- row 1 -->
+  <div class="row">
 
-    <!-- row 1 -->
-    <div class="row">
-
-      <!-- column 1 -->
-      <div class="col-md-6">
-        <h2>Components</h2>
-        <table class="table">
-          <thead>
+    <!-- column 1 -->
+    <div class="col-md-6">
+      <h2>Components</h2>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Component</th>
+            <th>Build status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in components %}
             <tr>
-              <th>Component</th>
-              <th>Build status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for item in components %}
-              <tr>
-                <td>
-                  <strong>{{ item.label }}</strong>
-                </td>
-                <td class="pull-right">
-                  {% if item.url_build_status %} 
-                    <img class="build" src='{{ item.url_build_status }}'/> 
-                  {% else %}
-                    n/a
-                  {% endif %}
-                </td>
-              </tr> 
-            {% endfor %}
-          </tbody>
-        </table>
-      </div> <!-- column 1 -->
+              <td>
+                <strong>{{ item.label }}</strong>
+              </td>
+              <td class="pull-right">
+                {% if item.url_build_status %} 
+                  <img class="build" src='{{ item.url_build_status }}'/> 
+                {% else %}
+                  n/a
+                {% endif %}
+              </td>
+            </tr> 
+          {% endfor %}
+        </tbody>
+      </table>
+    </div> <!-- column 1 -->
 
-      <!-- column 2 -->
-      <div class="col-md-6">
-        <h2>Validated packages</h2>
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Package</th>
-              <th>Category</th>
-              <th>Build status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for item in pkg_list %}
-              <tr class="searchable"> 
-                <td>
-                  <strong><a href="{{ item.url_package }}">{{ item.type }} - {{ item.name }} - version {{ item.version }}</a></strong> {% if item.url_doc %} <a href="{{ item.url_doc }}">(doc)</a> {% else %} (no doc <span class='glyphicon glyphicon-warning-sign' aria-hidden='true'></span>) {% endif %}
-                </td>
-                <td>
-                  {{ item.category }}
-                </td>
-                <td class="pull-right">
-                  {% if item.url_build_status %} 
-                    <img class="build" src='{{ item.url_build_status }}'/> 
-                  {% else %}
-                    n/a <span class='glyphicon glyphicon-warning-sign' aria-hidden='true'></span>
-                  {% endif %}
-                </td>
-              </tr> 
-            {% endfor %}
-          </tbody>
-        </table>
-      </div> <!-- column 2 -->
+    <!-- column 2 -->
+    <div class="col-md-6">
+      <h2>Validated packages</h2>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Package</th>
+            <th>Category</th>
+            <th>Build status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in pkg_list %}
+            <tr class="searchable"> 
+              <td>
+                <strong><a href="{{ item.url_package }}">{{ item.type }} - {{ item.name }} - version {{ item.version }}</a></strong> {% if item.url_doc %} <a href="{{ item.url_doc }}">(doc)</a> {% else %} (no doc <span class='glyphicon glyphicon-warning-sign' aria-hidden='true'></span>) {% endif %}
+              </td>
+              <td>
+                {{ item.category }}
+              </td>
+              <td class="pull-right">
+                {% if item.url_build_status %} 
+                  <img class="build" src='{{ item.url_build_status }}'/> 
+                {% else %}
+                  n/a <span class='glyphicon glyphicon-warning-sign' aria-hidden='true'></span>
+                {% endif %}
+              </td>
+            </tr> 
+          {% endfor %}
+        </tbody>
+      </table>
+    </div> <!-- column 2 -->
 
-    </div> <!-- row 1 -->
-    <!-- row 2 -->
-    <div class="row">
+  </div> <!-- row 1 -->
+  <!-- row 2 -->
+  <div class="row">
 
-      <!-- column 1 -->
-      <div class="col-md-6">
-        <h2>Submitted packages</h2>
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Package</th>
-              <th>Category</th>
-              <th>Build status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for item in sub_list %}
-              <tr class="searchable"> 
-                <td>
-                  <strong>{{ item.type }} - {{ item.name }} - version {{ item.version }}</strong>
-                </td>
-                <td>
-                  {{ item.category }}
-                </td>
-                <td class="pull-right">
-                  {% if item.url_build_status %} 
-                    <img class="build" src='{{ item.url_build_status }}'/> 
-                  {% else %}
-                    n/a
-                  {% endif %}
-                </td>
-              </tr> 
-            {% endfor %}
-          </tbody>
-        </table>
-      </div> <!-- column 3 -->
+    <!-- column 1 -->
+    <div class="col-md-6">
+      <h2>Submitted packages</h2>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Package</th>
+            <th>Category</th>
+            <th>Build status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in sub_list %}
+            <tr class="searchable"> 
+              <td>
+                <strong>{{ item.type }} - {{ item.name }} - version {{ item.version }}</strong>
+              </td>
+              <td>
+                {{ item.category }}
+              </td>
+              <td class="pull-right">
+                {% if item.url_build_status %} 
+                  <img class="build" src='{{ item.url_build_status }}'/> 
+                {% else %}
+                  n/a
+                {% endif %}
+              </td>
+            </tr> 
+          {% endfor %}
+        </tbody>
+      </table>
+    </div> <!-- column 3 -->
 
-    </div> <!-- row 1 -->
+  </div> <!-- row 1 -->
  
-    </div>
-  {% endif %}
+  </div>
 
 </div>
 {% endblock %}
