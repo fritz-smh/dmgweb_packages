@@ -12,9 +12,9 @@ First, configure GitHub to allow the Oauth!
 Go on https://github.com/settings/applications/new to register your application and fill the form :
 
 * Application name: dmgwev-package
-* Homepage url: http://les-cours-du-chaos.hd.free.fr/
+* Homepage url: http://my-repo.com/github-callback
 * Application description: ....
-* Authorization callback URL: Authorization callback URL
+* Authorization callback URL: http://my-repo.com/github-callback
 
 Click on "Register application". The tokens *client_id* and *client_secret* are generated. Keep them somewhere.
 
@@ -24,12 +24,19 @@ Install some prerequisites on the server:
     pip install GitHub-Flask
     pip install Flask-SQLAlchemy
     pip install Flask-Bootstrap
+    pip install Flask-WTF
     pip install Frozen-Flask
 
 
 On the server, clone the repository: 
 
     git clone https://github.com/fritz-smh/dmgweb_packages.git
+
+Create needed folder:
+
+    cd dmgweb_packages
+    mkdir logs
+    mkdir data
 
 Create a configuration file:
 
@@ -70,8 +77,8 @@ TODO : continue :)
 
 Create an **init.d** file. From the *dmgweb_packages* folder, run :
 
-    sed "s#___INSTALL_PATH___#$PWD/#" examples/init.sample > /etc/init.d/dmgweb_packages
-    chmomd a+x /etc/init.d/dmgweb_packages
+    sed "s#___INSTALL_PATH___#$PWD/../#" examples/init.sample > /etc/init.d/dmgweb_packages
+    chmod a+x /etc/init.d/dmgweb_packages
 
 
 Files and folders generated
