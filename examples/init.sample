@@ -11,12 +11,15 @@
 # Description:       This service is used to run dmgweb_packages
 ### END INIT INFO
 
+USER=___USER___
 
 case "$1" in 
     start)
         echo "Starting dmgweb_packages"
-        export PYTHONPATH=___INSTALL_PATH___/
-        nohup python ___INSTALL_PATH___/dmgweb_packages/application.py &
+        chown -R $USER ___INSTALL_PATH___/dmgweb_packages/logs/*
+        /bin/su - ${USER} -c "export PYTHONPATH=___INSTALL_PATH___/ ; nohup python ___INSTALL_PATH___/dmgweb_packages/application.py &"
+        #export PYTHONPATH=___INSTALL_PATH___/
+        #nohup python ___INSTALL_PATH___/dmgweb_packages/application.py &
         # notice that a pid file will be created as ___INSTALL_PATH___/dmgweb_packages/logs/dmgweb_packages.pid
         ;;
     stop)

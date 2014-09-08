@@ -71,16 +71,14 @@ Then, fill the configuration file **config.json**
         }
     }
 
+The following example assume the current user ($LOGNAME) is the user which will run the tool.
 
-TODO : continue :)
+Create an **init.d** file. From the *dmgweb_packages* folder, run as **root** :
 
-
-
-
-Create an **init.d** file. From the *dmgweb_packages* folder, run :
-
-    sed "s#___INSTALL_PATH___#$PWD/../#" examples/init.sample > /etc/init.d/dmgweb_packages
-    chmod a+x /etc/init.d/dmgweb_packages
+    THE_USER=$(echo $LOGNAME)
+    sudo sed "s#___INSTALL_PATH___#$PWD/../#g" examples/init.sample > /etc/init.d/dmgweb_packages
+    sudo sed -i "s#___USER___#${THE_USER}#g" /etc/init.d/dmgweb_packages 
+    sudo chmod a+x /etc/init.d/dmgweb_packages
 
 
 Files and folders generated
