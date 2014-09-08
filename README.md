@@ -46,6 +46,8 @@ Then, fill the configuration file **config.json**
 
 
     {
+      "server_ip" : "0.0.0.0",
+      "server_port" : "80",
       "github" : 
         {
           "client_id" : "c5a32b7a5e965432febd",
