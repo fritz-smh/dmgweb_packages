@@ -22,8 +22,8 @@ ICONS_DIR = "data/icons/"
 
 PWD = os.path.dirname(os.path.realpath(__file__))
 PACKAGES_LIST = "{0}/../data/packages.json".format(PWD)
-SUBMITTED_PACKAGES_LIST = "{0}/data/submitted_packages.json".format(PWD)
-REFUSED_PACKAGES_LIST = "{0}/data/refused_packages.json".format(PWD)
+SUBMITTED_PACKAGES_LIST = "{0}/../data/submitted_packages.json".format(PWD)
+REFUSED_PACKAGES_LIST = "{0}/../data/refused_packages.json".format(PWD)
 
 
 # allowed mime types for packages download
@@ -155,13 +155,16 @@ class PackageChecker():
 
             # extract the package icon
             logging.info("PackageChecker : content of the zip file :")
-            for member in myzip.namelist():
-                logging.info(member)
-            source = myzip.open(os.path.join(root_dir, ICON_FILE))
-            target = file(os.path.join(ICONS_DIR, "{0}_{1}_{2}.png".format(self.json_data['identity']['type'], self.json_data['identity']['name'], self.json_data['identity']['version'])), "wb")
-            with source, target:
-                shutil.copyfileobj(source, target)
- 
+            #for member in myzip.namelist():
+            #    logging.info(member)
+            try:
+                source = myzip.open(os.path.join(root_dir, ICON_FILE))
+                target = file(os.path.join(ICONS_DIR, "{0}_{1}_{2}.png".format(self.json_data['identity']['type'], self.json_data['identity']['name'], self.json_data['identity']['version'])), "wb")
+                with source, target:
+                    shutil.copyfileobj(source, target)
+            except KeyError:
+                logging.warning("PackageChecker : There is no icon in this zip archive!")
+                return False, "There is no icon in this zip archive!"
 
             return True, None
 
@@ -323,7 +326,7 @@ class SubmissionList():
             my_file.write(json.dumps(self.json))
             my_file.close()
         except:
-            raise error("Unable to save the submission list : {0}".format(traceback.format_exc()))
+            raise Exception("Unable to save the submission list : {0}".format(traceback.format_exc()))
     
     def validate(self, type, name, version, category, user):
         """ Validate a package :
