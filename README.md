@@ -26,6 +26,7 @@ Install some prerequisites on the server:
     pip install Flask-Bootstrap
     pip install Flask-WTF
     pip install Frozen-Flask
+    pip install magic
 
 
 On the server, clone the repository: 
