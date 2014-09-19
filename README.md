@@ -37,7 +37,7 @@ Create needed folder:
 
     cd dmgweb_packages
     mkdir logs
-    mkdir data
+    mkdir -p data/icons
 
 Create a configuration file:
 
