@@ -16,9 +16,11 @@ import logging
 
 ### package related configuration items
 
+# json
 JSON_FILE = "info.json"
 ICON_FILE = "design/icon.png"
-ICONS_DIR = "data/icons/"
+# dmwweb_package
+ICONS_DIR = "{0}/../data/icons/".format(os.path.dirname(os.path.realpath(__file__)))
 
 PWD = os.path.dirname(os.path.realpath(__file__))
 PACKAGES_LIST = "{0}/../data/packages.json".format(PWD)
@@ -159,6 +161,7 @@ class PackageChecker():
             #    logging.info(member)
             try:
                 source = myzip.open(os.path.join(root_dir, ICON_FILE))
+                logging.info("XXX {0}".format(os.path.join(ICONS_DIR, "{0}_{1}_{2}.png".format(self.json_data['identity']['type'], self.json_data['identity']['name'], self.json_data['identity']['version']))))
                 target = file(os.path.join(ICONS_DIR, "{0}_{1}_{2}.png".format(self.json_data['identity']['type'], self.json_data['identity']['name'], self.json_data['identity']['version'])), "wb")
                 with source, target:
                     shutil.copyfileobj(source, target)
