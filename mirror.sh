@@ -29,7 +29,9 @@ echo "Remove old mirror..."
 rm -f $MIRROR_DIR/data/mirror.tgz
 
 echo "Create data/mirror.tgz..."
-tar cvzf $MIRROR_DIR/data/mirror.tgz $MIRROR_DIR/mirror
+#tar cvzf $MIRROR_DIR/data/mirror.tgz $MIRROR_DIR/mirror
+cd $MIRROR_DIR/mirror
+tar cvzf $MIRROR_DIR/data/mirror.tgz *
 
 echo "Remove mirror folder..."
 rm -Rf $MIRROR_DIR/mirror

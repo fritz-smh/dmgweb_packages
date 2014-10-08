@@ -168,10 +168,10 @@ from dmgweb_packages.views.index import *
 from dmgweb_packages.views.packages import * 
 from dmgweb_packages.views.submission_list import * 
 from dmgweb_packages.views.icons import * 
-from dmgweb_packages.views.mirror import * 
 from dmgweb_packages.views.dashboard import * 
 
 if not BUILD:
+    from dmgweb_packages.views.mirror import * 
     from dmgweb_packages.views.change_category import * 
     from dmgweb_packages.views.core_team import * 
     from dmgweb_packages.views.delete_package import * 

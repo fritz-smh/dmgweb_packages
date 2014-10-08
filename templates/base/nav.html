@@ -24,7 +24,9 @@
           <a href="{{ url_for("dashboard") }}"><span class='glyphicon glyphicon-dashboard' aria-hidden='true'></span> Dashboard</a>
         </li>
         {% if g.build %}
+        <li>
           <a href="{{ g.root_repository_url }}"><span class='glyphicon glyphicon-plus' aria-hidden='true'></span> Submit a package</a>
+        </li>
         {% endif %}
         {% if g.username %}
           <li>
