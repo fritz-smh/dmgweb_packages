@@ -141,8 +141,10 @@
                     <p>
                       Just execute the given command line in a terminal as the domogik user.
                     </p>
-                  <h3>Command line</h3>
+                  <h3>Command line for the first installation</h3>
                     <pre> dmg_package --install {{ item.url_package }} --hash {{ item.hash_sha256 }}   </pre>
+                  <h3>Command line for an upgrade</h3>
+                    <pre> dmg_package --upgrade {{ item.url_package }} --hash {{ item.hash_sha256 }}   </pre>
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
