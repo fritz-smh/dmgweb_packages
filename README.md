@@ -58,9 +58,9 @@ Then, fill the configuration file **config.json**
       "root_repository" : "http://repo-dev.domogik.org/",
       "categories" : 
         [
-          { "id" : "nightly",    "name" : "Nightly",  "is_nightly" : true,  "is_obsolete" : false },
-          { "id" : "stable",     "name" : "Stable",   "is_nightly" : false, "is_obsolete" : false },
-          { "id" : "oldstable",  "name" : "Obsolete", "is_nightly" : false, "is_obsolete" : true }
+          { "id" : "development",    "name" : "Development",  "is_development" : true,  "is_obsolete" : false },
+          { "id" : "stable",     "name" : "Stable",   "is_development" : false, "is_obsolete" : false },
+          { "id" : "oldstable",  "name" : "Obsolete", "is_development" : false, "is_obsolete" : true }
         ],
       "dashboard" :
         {
