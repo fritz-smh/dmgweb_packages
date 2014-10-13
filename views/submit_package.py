@@ -130,14 +130,12 @@ def submit_package():
             #        and explain what is the GOAL !!!!!   
             is_development_pkg = True
             for a_category in categories.list():
-                flash("DEBUG : {0}".format(a_category), "info")
                 if a_category['id'] == form.category.data:
                     is_development_pkg = a_category['is_development']
                     break
                 
             # END TODO
             if is_development_pkg:
-                flash("DEBUG : MODE DEVELOPMENT")
                 in_development_list = DevelopmentList()
                 in_development_list.add(submitted_package)
                 in_development_list.list()
