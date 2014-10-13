@@ -26,6 +26,7 @@ PWD = os.path.dirname(os.path.realpath(__file__))
 PACKAGES_LIST = "{0}/../data/packages.json".format(PWD)
 SUBMITTED_PACKAGES_LIST = "{0}/../data/submitted_packages.json".format(PWD)
 REFUSED_PACKAGES_LIST = "{0}/../data/refused_packages.json".format(PWD)
+IN_DEVELOPMENT_PACKAGES_LIST = "{0}/../data/in_development_packages.json".format(PWD)
 
 
 # allowed mime types for packages download
@@ -404,3 +405,68 @@ class RefusedList():
         except:
             raise error("Unable to save the refused packages list : {0}".format(traceback.format_exc()))
     
+
+
+
+
+class DevelopmentList():
+    """ Class to manage the list of the 'in development' packages
+    """
+
+    def __init__(self):
+        ### load the json
+        # check if the file exists
+        if os.path.isfile(IN_DEVELOPMENT_PACKAGES_LIST):
+            self.json = json.load(open(IN_DEVELOPMENT_PACKAGES_LIST))
+        else:
+            self.json = []
+        pass
+
+    def list(self):
+        """ Return the list of 'in development' packages
+        """
+        return self.json
+    
+    def add(self, data):
+        """ add a package to the 'in development' list
+            Notice that the version is not needed/used
+        """
+        logging.info("New 'in development' package : {0}_{1} in version {2}".format(data["type"], data["name"], data["version"]))
+        # check unicity
+        for pkg in self.json:
+           # we don't check the version as this is a non used data (package in dev, so no version)
+           if pkg["type"] == data["type"] and pkg["name"] == data["name"]: 
+               raise PackagesListError("This package has already been validated by {0} (unique key is type/name)".format(pkg["submitter"]))
+               return
+        # add in the list
+        self.json.append(data)
+        self.save()
+
+    def delete(self, type, name):
+        """ delete a package from the 'in development' list
+            # the version is not used as a key as there are development packages
+        """
+        logging.info("Delete 'in development' package : {0}_{1}".format(data["type"], data["name"]))
+        # Keep all packages excepting the one
+        try:
+            self.json_buf = []
+            for pkg in self.json:
+               if not (pkg["type"] == type and pkg["name"] == name):
+                   self.json_buf.append(pkg)
+            # add in the list
+            self.json = self.json_buf
+            self.save()
+        except:
+            raise error("Unable to remove from the 'in development' list : {0}".format(traceback.format_exc()))
+
+    def save(self):
+        """ Save the list of 'in development' packages
+        """
+        try:
+            my_file = open(IN_DEVELOPMENT_PACKAGES_LIST, "w")
+            my_file.write(json.dumps(self.json))
+            my_file.close()
+        except:
+            raise error("Unable to save the 'in development' packages list : {0}".format(traceback.format_exc()))
+    
+
