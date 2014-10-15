@@ -10,6 +10,7 @@ import time
 import shutil
 import hashlib
 import logging
+from dmgweb_packages.common.category import Categories, CategoriesError
 
 
 
@@ -225,7 +226,7 @@ class PackagesList():
     def delete(self, type, name, version):
         """ delete a package from the submission list
         """
-        logging.info("Delete package : {0}_{1} in version {2}".format(data["type"], data["name"], data["version"]))
+        logging.info("Delete package : {0}_{1} in version {2}".format(type, name, version))
         # Keep all packages excepting the one
         try:
             self.json_buf = []
@@ -236,7 +237,7 @@ class PackagesList():
             self.json = self.json_buf
             self.save()
         except:
-            raise error("Unable to remove from the packages list : {0}".format(traceback.format_exc()))
+            raise Exception("Unable to remove from the packages list : {0}".format(traceback.format_exc()))
 
     def save(self):
         """ Save the list of packages
@@ -246,19 +247,50 @@ class PackagesList():
             my_file.write(json.dumps(self.json))
             my_file.close()
         except:
-            raise error("Unable to save the packages list : {0}".format(traceback.format_exc()))
+            raise Exception("Unable to save the packages list : {0}".format(traceback.format_exc()))
     
     def set_category(self, type, name, version, category):
         """ change the category of a package from the submission list
         """
+        the_categories = Categories().list()
         try:
             self.json_buf = []
             for pkg in self.json:
                if pkg["type"] == type and pkg["name"] == name and  pkg["version"] == version:
-                   pkg["category"] = category
-            self.save()
+                   # for 'is_development' category, move in the 'in development' packages json file
+                   # for regular categories, just update the json
+                   # for 'submission_list' value (hardcoded in the template choices), move in the submission list
+                   cat_type = 'regular'
+                   if category == 'submission_list':
+                       cat_type = 'submission'
+                   else:
+                       for a_category in the_categories:
+                           if a_category['id'] == category:
+                               if a_category['is_development']:
+                                   cat_type = 'development'
+                               break
+
+                   if cat_type == 'regular':
+                       pkg["category"] = category
+                       self.save()
+                       break
+                   elif cat_type == 'development':
+                       # add in the 'in development' list
+                       pkg_list = DevelopmentList()
+                       pkg_list.add(pkg)
+                       # delete in the current list
+                       self.delete(type, name, version)
+                   elif cat_type == 'submission':
+                       # add in the submission list
+                       pkg_list = SubmissionList()
+                       pkg_list.add(pkg)
+                       # delete in the current list
+                       self.delete(type, name, version)
+                   else:
+                       raise Exception("WTF, I am not able to find in which category I have to move the package!!!")
+                    
         except:
-            raise error("Unable to change the categery for the packages list : {0}".format(traceback.format_exc()))
+            raise Exception("Unable to change the categery for the packages list : {0}".format(traceback.format_exc()))
 
 
 
@@ -312,7 +344,7 @@ class SubmissionList():
             self.json = self.json_buf
             self.save()
         except:
-            raise error("Unable to remove from the submission list : {0}".format(traceback.format_exc()))
+            raise Exception("Unable to remove from the submission list : {0}".format(traceback.format_exc()))
 
     def get_package(self, type, name, version):
         """ return a given package from the submission list
@@ -403,7 +435,7 @@ class RefusedList():
             my_file.write(json.dumps(self.json))
             my_file.close()
         except:
-            raise error("Unable to save the refused packages list : {0}".format(traceback.format_exc()))
+            raise Exception("Unable to save the refused packages list : {0}".format(traceback.format_exc()))
     
 
 
@@ -457,7 +489,7 @@ class DevelopmentList():
             self.json = self.json_buf
             self.save()
         except:
-            raise error("Unable to remove from the 'in development' list : {0}".format(traceback.format_exc()))
+            raise Exception("Unable to remove from the 'in development' list : {0}".format(traceback.format_exc()))
 
     def save(self):
         """ Save the list of 'in development' packages
@@ -467,6 +499,6 @@ class DevelopmentList():
             my_file.write(json.dumps(self.json))
             my_file.close()
         except:
-            raise error("Unable to save the 'in development' packages list : {0}".format(traceback.format_exc()))
+            raise Exception("Unable to save the 'in development' packages list : {0}".format(traceback.format_exc()))
     
 

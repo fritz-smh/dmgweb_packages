@@ -249,9 +249,12 @@
                       <input name="version" type="hidden" value="{{ item.version }}">
                       <p><label class="control-label">Set the package category to </label></p>
                       <select id="category" name="category">
+                        <!-- all regular categories -->
                         {% for category in categories %}
                           <option value="{{ category.id }}" {% if item.category == category.id %} selected {% endif %}>{{ category.name }}</option>
                         {% endfor %}
+                        <!-- dedicated option for the packages list to allow to put back a package in the submission list -->
+                        <option value="submission_list">Move back in the submission list</option>
                       </select>
                     </div>
                     <div class="modal-footer">
