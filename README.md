@@ -21,6 +21,7 @@ Click on "Register application". The tokens *client_id* and *client_secret* are 
 
 Install some prerequisites on the server:
 
+    apt-get install realpath
     pip install GitHub-Flask
     pip install Flask-SQLAlchemy
     pip install Flask-Bootstrap
