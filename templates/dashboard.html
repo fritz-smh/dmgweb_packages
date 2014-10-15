@@ -68,7 +68,7 @@
                 <strong><a href="{{ item.url_package }}">{{ item.type }} - {{ item.name }} - version {{ item.version }}</a></strong>
               </td>
               <td>
-                {% if item.url_doc %} <a href="{{ item.url_doc }}">documentation</a> {% else %} no documentation <span class='glyphicon glyphicon-warning-sign' aria-hidden='true'></span> {% endif %}
+                {% if item.url_doc %} <a href="{{ item.url_doc }}">view</a> {% else %} n/a <span class='glyphicon glyphicon-warning-sign' aria-hidden='true'></span> {% endif %}
               </td>
               <td>
                 {{ item.category }}
@@ -112,7 +112,7 @@
                 <strong><a href="{{ item.url_package }}">{{ item.type }} - {{ item.name }} - version {{ item.version }}</a></strong>
               </td>
               <td>
-                {% if item.url_doc %} <a href="{{ item.url_doc }}">documentation</a> {% else %} no documentation <span class='glyphicon glyphicon-warning-sign' aria-hidden='true'></span> {% endif %}
+                {% if item.url_doc %} <a href="{{ item.url_doc }}">view</a> {% else %} n/a <span class='glyphicon glyphicon-warning-sign' aria-hidden='true'></span> {% endif %}
               </td>
               <td>
                 {{ item.category }}
@@ -146,13 +146,13 @@
           </tr>
         </thead>
         <tbody>
-          {% for item in sub_list %}
+          {% for item in dev_list %}
             <tr class="searchable"> 
               <td>
                 <strong><a href="{{ item.url_package }}">{{ item.type }} - {{ item.name }}</a></strong>
               </td>
               <td>
-                {% if item.url_doc %} <a href="{{ item.url_doc }}">documentation</a> {% else %} no documentation <span class='glyphicon glyphicon-warning-sign' aria-hidden='true'></span> {% endif %}
+                {% if item.url_doc %} <a href="{{ item.url_doc }}">view</a> {% else %} n/a <span class='glyphicon glyphicon-warning-sign' aria-hidden='true'></span> {% endif %}
               </td>
               <td>
                 {{ item.category }}
