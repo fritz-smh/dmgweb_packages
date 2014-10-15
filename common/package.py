@@ -11,6 +11,7 @@ import shutil
 import hashlib
 import logging
 from dmgweb_packages.common.category import Categories, CategoriesError
+from dmgweb_packages.common.tweet import tweet_message
 
 
 
@@ -206,12 +207,12 @@ class PackagesList():
         pass
 
     def list(self):
-        """ Return the list of submitted packages
+        """ Return the list of the packages
         """
         return self.json
     
     def add(self, data):
-        """ add a package to the submission list
+        """ add a package to the packages list
         """
         logging.info("New package : {0}_{1} in version {2}".format(data["type"], data["name"], data["version"]))
         # check unicity
@@ -222,6 +223,7 @@ class PackagesList():
         # add in the list
         self.json.append(data)
         self.save()
+        tweet_message("New package validated: {0}_{1} in version {2}".format(data["type"], data["name"], data["version"]))
 
     def delete(self, type, name, version):
         """ delete a package from the submission list
@@ -236,6 +238,7 @@ class PackagesList():
             # add in the list
             self.json = self.json_buf
             self.save()
+            tweet_message("Package deleted from the packages list: {0}_{1} in version {2}".format(type, name, version))
         except:
             raise Exception("Unable to remove from the packages list : {0}".format(traceback.format_exc()))
 
@@ -273,6 +276,7 @@ class PackagesList():
                    if cat_type == 'regular':
                        pkg["category"] = category
                        self.save()
+                       tweet_message("Package {0}_{1} in version {2} moved to category {3}".format(type, name, version, category))
                        break
                    elif cat_type == 'development':
                        # add in the 'in development' list
@@ -280,12 +284,14 @@ class PackagesList():
                        pkg_list.add(pkg)
                        # delete in the current list
                        self.delete(type, name, version)
+                       tweet_message("Package {0}_{1} in version {2} moved in the 'in development' packages list".format(type, name, version))
                    elif cat_type == 'submission':
                        # add in the submission list
                        pkg_list = SubmissionList()
                        pkg_list.add(pkg)
                        # delete in the current list
                        self.delete(type, name, version)
+                       tweet_message("Package {0}_{1} in version {2} moved back in the submission list".format(type, name, version))
                    else:
                        raise Exception("WTF, I am not able to find in which category I have to move the package!!!")
                     
@@ -329,6 +335,7 @@ class SubmissionList():
         # add in the list
         self.json.append(data)
         self.save()
+        tweet_message("New package in the submission list: {0}_{1} in version {2}".format(data["type"], data["name"], data["version"]))
 
     def delete(self, type, name, version):
         """ delete a package from the submission list
@@ -420,6 +427,7 @@ class RefusedList():
         # add in the list
         self.json.append(data)
         self.save()
+        tweet_message("Package refused from the submission list: {0}_{1} in version {2} (reason available online)".format(data["type"], data["name"], data["version"]))
 
     def delete(self, type, name, version):
         """ delete a package from the refused list
@@ -473,6 +481,7 @@ class DevelopmentList():
         # add in the list
         self.json.append(data)
         self.save()
+        tweet_message("New package in the 'in development' list: {0}_{1}".format(data["type"], data["name"]))
 
     def delete(self, type, name):
         """ delete a package from the 'in development' list

@@ -28,6 +28,7 @@ Install some prerequisites on the server:
     pip install Flask-WTF
     pip install Frozen-Flask
     pip install magic
+    pip install python-twitter
 
 
 On the server, clone the repository: 
@@ -56,6 +57,15 @@ Then, fill the configuration file **config.json**
           "client_secret" : "c543f3423a32cC435454353450674a076dd12ca7",
           "callback_url" : "http://my-repo.com/github-callback"
         },
+      "twitter" :
+        { 
+          "enable" : true,
+          "consumer_key" : "bcdsjbdsjbfdsbfjbdjfbdsjbfjb",
+          "consumer_secret" : "FDSFDSfdsfdsfsdfDSFSDFDSFDSfdsfdsFDSFSDFDSfsdfdsfsd",
+          "access_token" :  "324234234FDSFDR43RF34GF45TGF43FG54YTGTFG34TG45T3TG",
+          "access_token_secret" : "FDSF234R32RFreefg3R34Fdfefefreferff43432FFRFe"
+        },
+
       "root_repository" : "http://repo-dev.domogik.org/",
       "categories" : 
         [
@@ -82,6 +92,15 @@ Create an **init.d** file. From the *dmgweb_packages* folder, run as **root** :
     sudo sed -i "s#___USER___#${THE_USER}#g" /etc/init.d/dmgweb_packages 
     sudo chmod a+x /etc/init.d/dmgweb_packages
 
+
+Prerequisite : twitter account
+------------------------------
+
+A twitter account is needed to publish the repository updates (new package, ....)
+
+* Create a twitter account
+* Go on https://apps.twitter.com/app/new
+* Grab the key and access tokens
 
 Files and folders generated
 ---------------------------
