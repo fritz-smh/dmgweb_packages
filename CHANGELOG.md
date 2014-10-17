@@ -1,7 +1,11 @@
-1.1 (in progress)
-=================
+1.1
+===
 
-https://github.com/fritz-smh/dmgweb_packages/issues/1
+* Add support for 'in development' packages: they can be submitted and are listed in the dashboard
+* Improve the layout
+* Improve the submission page : add more description and dynamic description for each category
+* Add twitter support to tweet actions
+* Improve the logs
 
 1.0
 ===
