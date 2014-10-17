@@ -164,7 +164,6 @@ class PackageChecker():
             #    logging.info(member)
             try:
                 source = myzip.open(os.path.join(root_dir, ICON_FILE))
-                logging.info("XXX {0}".format(os.path.join(ICONS_DIR, "{0}_{1}_{2}.png".format(self.json_data['identity']['type'], self.json_data['identity']['name'], self.json_data['identity']['version']))))
                 target = file(os.path.join(ICONS_DIR, "{0}_{1}_{2}.png".format(self.json_data['identity']['type'], self.json_data['identity']['name'], self.json_data['identity']['version'])), "wb")
                 with source, target:
                     shutil.copyfileobj(source, target)
@@ -217,13 +216,17 @@ class PackagesList():
         logging.info("New package : {0}_{1} in version {2}".format(data["type"], data["name"], data["version"]))
         # check unicity
         for pkg in self.json:
-           if pkg["type"] == data["type"] and pkg["name"] == data["name"] and  pkg["version"] == data["version"]:
-               raise PackagesListError("This package has already been validated by {0} (unique key is type/name/version)".format(pkg["submitter"]))
-               return
+            if pkg["type"] == data["type"] and pkg["name"] == data["name"] and  pkg["version"] == data["version"]:
+                msg = "This package has already been validated by {0} (unique key is type/name/version)".format(pkg["submitter"])
+                logging.error(msg)
+                raise PackagesListError(msg)
+                return
         # add in the list
         self.json.append(data)
         self.save()
-        tweet_message("New package validated: {0}_{1} in version {2}".format(data["type"], data["name"], data["version"]))
+        msg = "New package validated: {0}_{1} in version {2}".format(data["type"], data["name"], data["version"])
+        logging.info(msg)
+        tweet_message(msg)
 
     def delete(self, type, name, version):
         """ delete a package from the submission list
@@ -238,9 +241,13 @@ class PackagesList():
             # add in the list
             self.json = self.json_buf
             self.save()
-            tweet_message("Package deleted from the packages list: {0}_{1} in version {2}".format(type, name, version))
+            msg = "Package deleted from the packages list: {0}_{1} in version {2}".format(type, name, version)
+            logging.info(msg)
+            tweet_message(msg)
         except:
-            raise Exception("Unable to remove from the packages list : {0}".format(traceback.format_exc()))
+            msg = "Unable to remove from the packages list : {0}".format(traceback.format_exc())
+            logging.error(msg)
+            raise Exception(msg)
 
     def save(self):
         """ Save the list of packages
@@ -250,7 +257,9 @@ class PackagesList():
             my_file.write(json.dumps(self.json))
             my_file.close()
         except:
-            raise Exception("Unable to save the packages list : {0}".format(traceback.format_exc()))
+            msg = "Unable to save the packages list : {0}".format(traceback.format_exc())
+            logging.error(msg)
+            raise Exception(msg)
     
     def set_category(self, type, name, version, category):
         """ change the category of a package from the submission list
@@ -276,7 +285,9 @@ class PackagesList():
                    if cat_type == 'regular':
                        pkg["category"] = category
                        self.save()
-                       tweet_message("Package {0}_{1} in version {2} moved to category {3}".format(type, name, version, category))
+                       msg = "Package {0}_{1} in version {2} moved to category {3}".format(type, name, version, category)
+                       logging.info(msg)
+                       tweet_message(msg)
                        break
                    elif cat_type == 'development':
                        # add in the 'in development' list
@@ -284,19 +295,27 @@ class PackagesList():
                        pkg_list.add(pkg)
                        # delete in the current list
                        self.delete(type, name, version)
-                       tweet_message("Package {0}_{1} in version {2} moved in the 'in development' packages list".format(type, name, version))
+                       msg = "Package {0}_{1} in version {2} moved in the 'in development' packages list".format(type, name, version)
+                       logging.info(msg)
+                       tweet_message(msg)
                    elif cat_type == 'submission':
                        # add in the submission list
                        pkg_list = SubmissionList()
                        pkg_list.add(pkg)
                        # delete in the current list
                        self.delete(type, name, version)
-                       tweet_message("Package {0}_{1} in version {2} moved back in the submission list".format(type, name, version))
+                       msg = "Package {0}_{1} in version {2} moved back in the submission list".format(type, name, version)
+                       logging.info(msg)
+                       tweet_message(msg)
                    else:
-                       raise Exception("WTF, I am not able to find in which category I have to move the package!!!")
+                       msg = "WTF, I am not able to find in which category I have to move the package!!!"
+                       logging.error(msg)
+                       raise Exception(msg)
                     
         except:
-            raise Exception("Unable to change the categery for the packages list : {0}".format(traceback.format_exc()))
+            msg = "Unable to change the categery for the packages list : {0}".format(traceback.format_exc())
+            logging.error(msg)
+            raise Exception(msg)
 
 
 
@@ -330,12 +349,15 @@ class SubmissionList():
         # check unicity
         for pkg in self.json:
            if pkg["type"] == data["type"] and pkg["name"] == data["name"] and  pkg["version"] == data["version"]:
-               raise SubmissionError("This package has already been submitted by {0} (unique key is type/name/version)".format(pkg["submitter"]))
-               return
+               msg = "This package has already been submitted by {0} (unique key is type/name/version)".format(pkg["submitter"])
+               logging.error(msg)
+               raise SubmissionError(msg)
         # add in the list
         self.json.append(data)
         self.save()
-        tweet_message("New package in the submission list: {0}_{1} in version {2}".format(data["type"], data["name"], data["version"]))
+        msg = "New package in the submission list: {0}_{1} in version {2}".format(data["type"], data["name"], data["version"])
+        logging.info(msg)
+        tweet_message(msg)
 
     def delete(self, type, name, version):
         """ delete a package from the submission list
@@ -351,7 +373,9 @@ class SubmissionList():
             self.json = self.json_buf
             self.save()
         except:
-            raise Exception("Unable to remove from the submission list : {0}".format(traceback.format_exc()))
+            msg = "Unable to remove from the submission list : {0}".format(traceback.format_exc())
+            logging.error(msg)
+            raise Exception(msg)
 
     def get_package(self, type, name, version):
         """ return a given package from the submission list
@@ -369,7 +393,9 @@ class SubmissionList():
             my_file.write(json.dumps(self.json))
             my_file.close()
         except:
-            raise Exception("Unable to save the submission list : {0}".format(traceback.format_exc()))
+            msg = "Unable to save the submission list : {0}".format(traceback.format_exc())
+            logging.error(msg)
+            raise Exception(msg)
     
     def validate(self, type, name, version, category, user):
         """ Validate a package :
@@ -427,7 +453,9 @@ class RefusedList():
         # add in the list
         self.json.append(data)
         self.save()
-        tweet_message("Package refused from the submission list: {0}_{1} in version {2} (reason available online)".format(data["type"], data["name"], data["version"]))
+        msg = "Package refused from the submission list: {0}_{1} in version {2} (reason available online)".format(data["type"], data["name"], data["version"])
+        logging.info(msg)
+        tweet_message(msg)
 
     def delete(self, type, name, version):
         """ delete a package from the refused list
@@ -443,7 +471,9 @@ class RefusedList():
             my_file.write(json.dumps(self.json))
             my_file.close()
         except:
-            raise Exception("Unable to save the refused packages list : {0}".format(traceback.format_exc()))
+            msg = "Unable to save the refused packages list : {0}".format(traceback.format_exc())
+            logging.error(msg)
+            raise Exception(msg)
     
 
 
@@ -474,14 +504,18 @@ class DevelopmentList():
         logging.info("New 'in development' package : {0}_{1} in version {2}".format(data["type"], data["name"], data["version"]))
         # check unicity
         for pkg in self.json:
-           # we don't check the version as this is a non used data (package in dev, so no version)
-           if pkg["type"] == data["type"] and pkg["name"] == data["name"]: 
-               raise PackagesListError("This package has already been validated by {0} (unique key is type/name)".format(pkg["submitter"]))
-               return
+            # we don't check the version as this is a non used data (package in dev, so no version)
+            if pkg["type"] == data["type"] and pkg["name"] == data["name"]: 
+                msg = "This package has already been validated by {0} (unique key is type/name)".format(pkg["submitter"])
+                logging.error(msg)
+                raise PackagesListError(msg)
+                return
         # add in the list
         self.json.append(data)
         self.save()
-        tweet_message("New package in the 'in development' list: {0}_{1}".format(data["type"], data["name"]))
+        msg = "New package in the 'in development' list: {0}_{1}".format(data["type"], data["name"])
+        logging.info(msg)
+        tweet_message(msg)
 
     def delete(self, type, name):
         """ delete a package from the 'in development' list
@@ -498,7 +532,9 @@ class DevelopmentList():
             self.json = self.json_buf
             self.save()
         except:
-            raise Exception("Unable to remove from the 'in development' list : {0}".format(traceback.format_exc()))
+            msg = "Unable to remove from the 'in development' list : {0}".format(traceback.format_exc())
+            logging.error(msg)
+            raise Exception(msg)
 
     def save(self):
         """ Save the list of 'in development' packages
@@ -508,6 +544,8 @@ class DevelopmentList():
             my_file.write(json.dumps(self.json))
             my_file.close()
         except:
-            raise Exception("Unable to save the 'in development' packages list : {0}".format(traceback.format_exc()))
+            msg = "Unable to save the 'in development' packages list : {0}".format(traceback.format_exc())
+            logging.error(msg)
+            raise Exception(msg)
     
 

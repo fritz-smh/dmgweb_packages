@@ -2,6 +2,7 @@
 from flask import Flask, request, g, session, redirect, url_for
 from flask import render_template, render_template_string
 from dmgweb_packages.application import app, github, User, db_session
+import logging
 
 @github.access_token_getter
 def token_getter():
@@ -25,6 +26,7 @@ def authorized(access_token):
     db_session.commit()
 
     session['user_id'] = user.id
+    logging.info("Login....")
     return redirect(url_for('index'))
 
 
@@ -39,5 +41,6 @@ def login():
 @app.route('/logout')
 def logout():
     session.pop('user_id', None)
+    logging.info("Logout...")
     return redirect(url_for('index'))
 
