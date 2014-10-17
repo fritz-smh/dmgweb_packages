@@ -137,6 +137,7 @@ def before_request():
             # get user informations
             g.user = User.query.get(session['user_id'])
             g.username = github.get('user')['login']
+            logging.info("--- Before request | username = {0}".format(g.username))
             # is the user member of the Domogik organisation ?
             # True or False
             g.core_team = is_core_team_member(github, DOMOGIK_ORGANISATION, g.username)
@@ -147,6 +148,8 @@ def before_request():
 
 @app.after_request
 def after_request(response):
+    if 'user_id' in session:
+        logging.info("--- After request | username = {0}".format(g.username))
     db_session.remove()
     return response
 

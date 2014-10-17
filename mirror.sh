@@ -11,11 +11,12 @@
 # /path/to/mirror.sh > /path/to/log/dmgweb_package_mirror_$(date "+%Y%m%d_%H%M").log
 
 OLDPWD=$PWD
-MIRROR_DIR=$(dirname $0)
+MIRROR_DIR=$(dirname $(realpath $0))
+BACKUP_DIR=$MIRROR_DIR/backup/
 cd $MIRROR_DIR
 
 echo "Generate the static website..."
-export PYTHONPATH=$MIRROR_DIR/../
+export PYTHONPATH=$(dirname $MIRROR_DIR/)
 python $PYTHONPATH/dmgweb_packages/application.py build
 
 echo "Do a copy of the json files just in case we loose the master ones..."
@@ -35,6 +36,11 @@ tar cvzf $MIRROR_DIR/data/mirror.tgz *
 
 echo "Remove mirror folder..."
 rm -Rf $MIRROR_DIR/mirror
+
+echo "Generate backup..."
+NOW=$(date "+%Y%m%d_%H%M")
+mkdir -p $BACKUP_DIR
+cp -p $MIRROR_DIR/data/mirror.tgz $BACKUP_DIR/mirror-backup-$NOW.tgz
 
 echo "Finished :)"
 

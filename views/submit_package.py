@@ -7,7 +7,7 @@ from wtforms import TextField, HiddenField, SelectField
 from wtforms.validators import DataRequired
 
 from dmgweb_packages.application import app, github, login_required
-from dmgweb_packages.common.package import PackageChecker, SubmissionList, SubmissionError
+from dmgweb_packages.common.package import PackageChecker, SubmissionList, SubmissionError, DevelopmentList
 from dmgweb_packages.common.category import Categories, CategoriesError
 import json
 import os
@@ -55,6 +55,8 @@ def submit_package():
     # TODO : reactivate CSRF !!!!
     form = FormSubmitPackage(request.form, csrf_enabled=False)
     
+    categories = Categories()
+
     print request.form
     if form.validate_on_submit() and form.step.data == '1':
         ### data from the form
@@ -98,7 +100,7 @@ def submit_package():
         except:
             # if we can't delete the tmp file, never mind...
             pass
-        return render_template('submit_package.html', form = form, step = 2)
+        return render_template('submit_package.html', form = form, categories = categories.list(), step = 2)
 
     elif form.validate_on_submit() and form.step.data == '2':
         success = False
@@ -121,17 +123,35 @@ def submit_package():
                               "submission_date" : time.time()
                             }
         try:
-            submission_list = SubmissionList()
-            submission_list.add(submitted_package)
-            submission_list.list()
-            success = True
+            # TODO : if category = is_development, then put a a dedicated json file
+            #        and also display a notice at the end ad the submission
+            #        In the first form view (if form.step.data == '1', add a warning about the fact
+            #        that the package won't be in the submission list but in the develpment need
+            #        and explain what is the GOAL !!!!!   
+            is_development_pkg = True
+            for a_category in categories.list():
+                if a_category['id'] == form.category.data:
+                    is_development_pkg = a_category['is_development']
+                    break
+                
+            # END TODO
+            if is_development_pkg:
+                in_development_list = DevelopmentList()
+                in_development_list.add(submitted_package)
+                in_development_list.list()
+                success = True
+            else:
+                submission_list = SubmissionList()
+                submission_list.add(submitted_package)
+                submission_list.list()
+                success = True
         except SubmissionError as e: 
             flash(e.value, "error")
         except:
             flash(traceback.format_exc(), "error")
-        return render_template('submit_package.html', form = form, step = 3, success = success)
+        return render_template('submit_package.html', form = form, categories = categories.list(), step = 3, success = success)
     else:
         form.step.data = '1'
-        return render_template('submit_package.html', form = form, step = 1)
+        return render_template('submit_package.html', form = form, categories = categories.list(), step = 1)
 
 

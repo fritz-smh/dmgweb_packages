@@ -7,12 +7,20 @@
       "client_secret" : "fffffffffffffffffffffff820674a076dd12ca7",
       "callback_url" : "http://my-repo.fr/github-callback"
     },
+  "twitter" : 
+    {
+      "enable" : true,
+      "consumer_key" : "bcdsjbdsjbfdsbfjbdjfbdsjbfjb",
+      "consumer_secret" : "FDSFDSfdsfdsfsdfDSFSDFDSFDSfdsfdsFDSFSDFDSfsdfdsfsd",
+      "access_token" :  "324234234FDSFDR43RF34GF45TGF43FG54YTGTFG34TG45T3TG",
+      "access_token_secret" : "FDSF234R32RFreefg3R34Fdfefefreferff43432FFRFe"
+    },
   "root_repository" : "http://repo-dev.domogik.org/",
   "categories" : 
     [
-      { "id" : "nightly",    "name" : "Nightly",  "is_nightly" : true,  "is_obsolete" : false },
-      { "id" : "stable",     "name" : "Stable",   "is_nightly" : false, "is_obsolete" : false },
-      { "id" : "oldstable",  "name" : "Obsolete", "is_nightly" : false, "is_obsolete" : true }
+      { "id" : "development",    "name" : "Development",  "is_development" : true,  "is_obsolete" : false },
+      { "id" : "stable",     "name" : "Stable",   "is_development" : false, "is_obsolete" : false },
+      { "id" : "oldstable",  "name" : "Obsolete", "is_development" : false, "is_obsolete" : true }
     ],
   "dashboard" :
     {

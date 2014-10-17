@@ -7,8 +7,18 @@
     This packages repository is similar as a store or market for smartphones. You will find all the packages for Domogik, a home automation system which is free and open source. 
   </p>
   <p>
-    <a href="/packages">Go and search for packages!</a>
+    <strong><a href="/packages">Go and search for packages!</a></strong>
   </p>
+
+  <h1>How to use this package repository ?</h1>
+  <p>If you are not a package developper, you will have access to three sections : </p>
+  <ul>
+    <li><strong><a href="{{ url_for("packages") }}">Packages:</a></strong> this section will list all the validated packages. This is the place where you should look for packages.</li>
+    <li><strong><a href="{{ url_for("submission_list") }}">Submitted packages:</a></strong> this section is mainly for your information. You will the packages submitted by the packages developpers but not yet validated (or refused) by the Domogik team.</li>
+    <li><strong><a href="{{ url_for("dashboard") }}">Dashboard:</a></strong> this section will give you an overview of all the components and packages status. This section can be used to have an overview of the build status of all components and packages. In this section you will also find the list of all the packages in development.</li>
+  </ul>
+
+  <p>If you are a package developper, with a GitHub account you can login to the root packages repository. When logged in, you will be able to submit some packages and to access the list of all the refused packages. 
 
   {% if not g.build %}
     <h1>Create a mirror for this website!</h1>
