@@ -12,5 +12,7 @@ import traceback
 def packages():
     pkg_list = PackagesList()
     categories = Categories()
-    return render_template('packages_list.html', view = 'packages_list', pkg_list = pkg_list.list(), categories = categories.list())
+    pkg_list = pkg_list.list()
+    pkg_list.sort()
+    return render_template('packages_list.html', view = 'packages_list', pkg_list = pkg_list, categories = categories.list())
 
