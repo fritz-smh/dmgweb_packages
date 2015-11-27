@@ -13,6 +13,6 @@ def packages():
     pkg_list = PackagesList()
     categories = Categories()
     pkg_list = pkg_list.list()
-    pkg_list.sort()
+    #pkg_list.sort()
     return render_template('packages_list.html', view = 'packages_list', pkg_list = pkg_list, categories = categories.list())
 

@@ -12,6 +12,7 @@ import hashlib
 import logging
 from dmgweb_packages.common.category import Categories, CategoriesError
 from dmgweb_packages.common.tweet import tweet_message
+from operator import itemgetter
 
 
 
@@ -208,7 +209,8 @@ class PackagesList():
     def list(self):
         """ Return the list of the packages
         """
-        return self.json
+        data = self.json
+        return sorted(data,key=itemgetter('type', 'name', 'version'))
     
     def add(self, data):
         """ add a package to the packages list
@@ -254,7 +256,7 @@ class PackagesList():
         """
         try:
             my_file = open(PACKAGES_LIST, "w")
-            my_file.write(json.dumps(self.json))
+            my_file.write(json.dumps(self.json, sort_keys = True))
             my_file.close()
         except:
             msg = "Unable to save the packages list : {0}".format(traceback.format_exc())
@@ -390,7 +392,7 @@ class SubmissionList():
         """
         try:
             my_file = open(SUBMITTED_PACKAGES_LIST, "w")
-            my_file.write(json.dumps(self.json))
+            my_file.write(json.dumps(self.json, sort_keys = True))
             my_file.close()
         except:
             msg = "Unable to save the submission list : {0}".format(traceback.format_exc())
@@ -468,7 +470,7 @@ class RefusedList():
         """
         try:
             my_file = open(REFUSED_PACKAGES_LIST, "w")
-            my_file.write(json.dumps(self.json))
+            my_file.write(json.dumps(self.json, sort_keys = True))
             my_file.close()
         except:
             msg = "Unable to save the refused packages list : {0}".format(traceback.format_exc())
@@ -541,7 +543,7 @@ class DevelopmentList():
         """
         try:
             my_file = open(IN_DEVELOPMENT_PACKAGES_LIST, "w")
-            my_file.write(json.dumps(self.json))
+            my_file.write(json.dumps(self.json, sort_keys = True))
             my_file.close()
         except:
             msg = "Unable to save the 'in development' packages list : {0}".format(traceback.format_exc())
