@@ -342,7 +342,8 @@ class SubmissionList():
     def list(self):
         """ Return the list of submitted packages
         """
-        return self.json
+        data = self.json
+        return sorted(data,key=itemgetter('type', 'name', 'version'))
     
     def add(self, data):
         """ add a package to the submission list
@@ -445,7 +446,8 @@ class RefusedList():
     def list(self):
         """ Return the list of refused packages
         """
-        return self.json
+        data = self.json
+        return sorted(data,key=itemgetter('type', 'name', 'version'))
     
     def add(self, data):
         """ add a package to the refused list
@@ -497,7 +499,8 @@ class DevelopmentList():
     def list(self):
         """ Return the list of 'in development' packages
         """
-        return self.json
+        data = self.json
+        return sorted(data,key=itemgetter('type', 'name', 'version'))
     
     def add(self, data):
         """ add a package to the 'in development' list
