@@ -1,0 +1,51 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+
+<div class="container">
+  <h1>{% trans %}New package {% endtrans %}</h1>
+
+  <div id='status'>
+    <span id='downloading' class='label label-default'>{% trans %}Downloading the package{% endtrans %}</span>
+    <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+    <span id='settings' class='label label-default'>{% trans %}Configuring the package{% endtrans %}</span>
+    <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+    <span id='done' class='label label-default'>{% trans %}Creating the package{% endtrans %}</span>
+    <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+    <span id='submiting_release' class='label label-default'>{% trans %}Submitting the package release{% endtrans %}</span>
+
+  </div>
+  <hr>
+</div>
+
+
+<div id='forms'>
+  <div class='container'>
+    <p>{% trans %}We are downloading the package to check it.{% endtrans %}</p>
+    <p>{% trans %}Please wait.{% endtrans %}</p>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+$('#downloading').removeClass();
+$('#downloading').addClass('label label-warning');
+$.post( "{{ url_for('submit_new_package_async') }}", { url: "{{ url }}" } )
+  .done(function( data ) {
+    $('#downloading').removeClass();
+    $('#downloading').addClass('label label-success');
+    $('#forms').html(data);
+    $('#settings').removeClass();
+    $('#settings').addClass('label label-warning');
+  })
+  .fail(function( xhr, textStatus, errorThrown ) {
+    $('#downloading').removeClass();
+    $('#downloading').addClass('label label-danger');
+    $('#forms').html(xhr.responseText);
+  })
+  .always(function() {
+  });
+</script>
+
+{% endblock %}
+

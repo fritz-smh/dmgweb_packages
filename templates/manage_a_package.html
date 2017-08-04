@@ -1,0 +1,137 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+
+<div class="container">
+  <h1>{% trans %}Package{% endtrans %} {{ package_id }}</h1>
+
+  <div class="alert alert-info" role="alert">
+    <h2>{% trans %}Submit a new release{% endtrans %}</h2>
+    <form method="post" action="{{ url_for("submit_new_package_release") }}" class="form-inline">
+      <div class="form-group ">
+        <label class="sr-only" for="package">{% trans %}Package release url{% endtrans %}</label> 
+        <div class="input-group">
+          <div class="input-group-addon">{% trans %}Package release url :{% endtrans %}</div>
+          {{ form_new.url(class_="form-control") }}
+          <span class="input-group-btn">
+            <input type="submit" value="{% trans %}Create{% endtrans %}" class="btn btn-primary">
+          </span>
+        </div>
+        <span class="help-block">Fill the url of the .zip file of your package. Example : <em>https://github.com/fritz-smh/domogik-plugin-diskfree/archive/1.0.zip</em></span>
+      </div>
+    </form>
+  </div>
+
+  <div class="row">
+    <div class="col col-md-8">
+      {% for release in releases %}
+        <div class="panel panel-primary">
+          <div class="panel-heading">
+            <h3 class="panel-title">{% trans %}Release {% endtrans %}{{ release.release }}</h3>
+          </div>
+          <div class="panel-body">
+            <img src="{{ url_for("icons", type=type, name=name, release=release.release) }}"> 
+          </div>
+          <table class="table">
+            <tr>
+              <td>{% trans %}Status{% endtrans %}</td>
+              <td>{{ release.status }}</td>
+            </tr>
+            <tr>
+              <td>{% trans %}Package url{% endtrans %}</td>
+              <td><a href="{{ release.url_package }}">{{ release.url_package }}</a></td>
+            </tr>
+            <tr>
+              <td>{% trans %}Package documentation{% endtrans %}</td>
+              <td><a href="{{ release.url_documentation }}">{{ release.url_documentation }}</a></td>
+            </tr>
+            <tr>
+              <td>{% trans %}Package tests{% endtrans %}</td>
+              <td><a href="{{ release.url_tests }}">{{ release.url_tests }}</a></td>
+            </tr>
+            <tr>
+              <td>{% trans %}Submitted on {% endtrans %}</td>
+              <td>{{ release.timestamp|datetime }}</td>
+            </tr>
+          </table>
+          <div class="panel-footer">
+            TODO
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+
+    <div class="col col-md-4">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <h3 class="panel-title">{% trans %}Informations{% endtrans %}</h3>
+        </div>
+        <table class="table">
+          <tr>
+            <td>{% trans %}Author email{% endtrans %}</td>
+            <td>{{ informations.author_email }}</td>
+          </tr>
+          <tr>
+            <td>{% trans %}Website{% endtrans %}</td>
+            <td><a href="{{ informations.site }}">{{ informations.site }}</a></td>
+          </tr>
+          <tr>
+            <td>{% trans %}New plugin ?{% endtrans %}</td>
+            <td>{{ informations.is_new }}</td>
+          </tr>
+        </table>
+      </div>
+
+      <hr>
+
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <h3 class="panel-title">{% trans %}Opened pull requests{% endtrans %}</h3>
+        </div>
+        <table class="table">
+        {% for pull in pull_requests %}
+          <tr><td>{{ pull | safe }}</td></tr>
+        {% endfor %}
+        </table>
+      </div>
+
+      <hr>
+
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <h3 class="panel-title">{% trans %}Opened issues{% endtrans %}</h3>
+        </div>
+        <div class="panel-body">
+          {% if new_issue_url != None %}
+            <a class='btn btn-danger' href='{{ new_issue_url}}'>{% trans %}Create a new issue{% endtrans %}</a>
+          {% endif %}
+        </div>
+        <table class="table">
+        {% for issue in issues %}
+          <tr><td>{{ issue | safe }}</td></tr>
+        {% endfor %}
+        </table>
+      </div>
+
+      <hr>
+
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <h3 class="panel-title">{% trans %}Notes{% endtrans %}</h3>
+        </div>
+        <div class="panel-body">
+          {% for note in notes %}
+            <pre>{{ note }}</pre>
+          {% endfor %}
+        </div>
+      </div>
+
+
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}
+

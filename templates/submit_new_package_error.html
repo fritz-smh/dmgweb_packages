@@ -1,0 +1,27 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+
+<div class="container">
+  <h1>{% trans %}New package {% endtrans %}</h1>
+
+  <div id='status'>
+    <span id='downloading' class='label label-success'>{% trans %}Downloading the package{% endtrans %}</span>
+    <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+    <span id='settings' class='label label-success'>{% trans %}Configuring the package{% endtrans %}</span>
+    <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+    <span id='done' class='label label-danger'>{% trans %}Creating the package{% endtrans %}</span>
+    <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+    <span id='submiting_release' class='label label-default'>{% trans %}Submitting the package release{% endtrans %}</span>
+  </div>
+  <hr>
+  <div class="alert alert-warning">
+    <p><strong>{% trans %}Error : {% endtrans %}</strong></p>
+    <p>{{ error | safe }}</p>
+  </div>
+</div>
+
+
+
+{% endblock %}
+

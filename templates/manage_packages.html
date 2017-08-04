@@ -1,0 +1,45 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+
+<div class="container">
+  <h1>{% trans %}Submit a package release{% endtrans %}</h1>
+
+  <div class="alert alert-info" role="alert">
+    <p>{% trans %}On this page you can submit a release for an existing package or a new package.{% endtrans %}</p>
+  </div>
+
+  <h2>{% trans %}Select an existing package{% endtrans %}</h2>
+  <form method="post" action="{{ url_for("manage_a_package") }}" class="form-inline">
+    <div class="form-group ">
+      <label class="sr-only" for="package">{% trans %}Select an existing package{% endtrans %}</label> 
+      <div class="input-group">
+        <div class="input-group-addon">{% trans %}Package :{% endtrans %}</div>
+        {{ form_existing.package(class_="form-control") }}
+        <span class="input-group-btn">
+          <input type="submit" value="{% trans %}Select{% endtrans %}" class="btn btn-primary">
+        </span>
+      </div>
+    </div>
+  </form>
+
+
+  <h2>{% trans %}Or create a new one{% endtrans %}</h2>
+  <form method="post" action="{{ url_for("submit_new_package") }}" class="form-inline">
+    <div class="form-group ">
+      <label class="sr-only" for="package">{% trans %}Package release url{% endtrans %}</label> 
+      <div class="input-group">
+        <div class="input-group-addon">{% trans %}Package release url :{% endtrans %}</div>
+        {{ form_new.url(class_="form-control") }}
+        <span class="input-group-btn">
+          <input type="submit" value="{% trans %}Create{% endtrans %}" class="btn btn-primary">
+        </span>
+      </div>
+      <span class="help-block">Fill the url of the .zip file of your package. Example : <em>https://github.com/fritz-smh/domogik-plugin-diskfree/archive/1.0.zip</em></span>
+    </div>
+  </form>
+
+</div>
+
+{% endblock %}
+

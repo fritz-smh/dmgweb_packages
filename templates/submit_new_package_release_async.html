@@ -1,0 +1,27 @@
+{% if error != None %}
+  <div class="container">
+    <div class="alert alert-warning">
+      <p>{% trans %}Error while downloading and checking the package release from : {% endtrans %} {{ url }}</p>
+      <p>{{ error | safe }}</p>
+    </div>
+
+  </div>
+
+{% else %}
+  <div class="container">
+    <div class="alert alert-info" role="alert">
+      <p>{% trans %}The package release is submitted.{% endtrans %}</p>
+      <p>{% trans %}Its url is {% endtrans %}<a href='{{url}}'>{{url}}</a></p>
+    </div>
+  
+  <form method="post" action="{{ url_for("manage_a_package") }}" class="form-inline">
+    <input type="hidden" name="package" value="{{type}}-{{name}}">
+    <div class="form-group ">
+      <input type="submit" value="{% trans %}Access to the package management page...{% endtrans %}" class="btn btn-primary">
+    </div>
+  </form>
+
+    
+  
+  </div>
+{% endif %}

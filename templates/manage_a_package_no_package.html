@@ -1,0 +1,14 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+
+<div class="container">
+  <h1>{% trans %}Package{% endtrans %} {{ package_id }}</h1>
+
+  <div class="alert alert-danger" role="alert">
+    <h2>{% trans %}Oups!{% endtrans %}</h2>
+    <p>{% trans %}Hey, you are looking for a manage that does not exists!{% endtrans %}</p>
+  </div>
+
+{% endblock %}
+

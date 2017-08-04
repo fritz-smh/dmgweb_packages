@@ -1,0 +1,46 @@
+<nav class="navbar navbar-dmg navbar-static-top" role="navigation">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="/">Domogik packages</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li>
+          <a href="{{ url_for("manage_packages") }}"><span class='glyphicon glyphicon-plus' aria-hidden='true'></span> {% trans %}Manage the packages{% endtrans %}</a>
+        </li>
+        {% if g.core_team %}
+        <li>
+          <a href="#"><span class='glyphicon glyphicon-user' aria-hidden='true'></span> Core team</a>
+        </li>
+        {% endif %}
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+          {% if g.username %}
+          <li>
+              <a href="{{ url_for("user") }}">{{ g.username }}
+              {% if g.core_team %}
+                *
+              {% endif %}
+              </a>
+          </li>
+        {% endif %}
+        <li>
+          {% if g.user %}
+            <a href="{{ url_for("logout") }}">Logout</a> 
+          {% elif not g.build %}
+            <a href="{{ url_for("login") }}">Login (github Oauth)</a>    
+          {% endif %}
+        </li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>

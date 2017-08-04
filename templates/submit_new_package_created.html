@@ -1,0 +1,35 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+
+<div class="container">
+  <h1>{% trans %}New package {% endtrans %}</h1>
+
+  <div id='status'>
+    <span id='downloading' class='label label-success'>{% trans %}Downloading the package{% endtrans %}</span>
+    <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+    <span id='settings' class='label label-success'>{% trans %}Configuring the package{% endtrans %}</span>
+    <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+    <span id='done' class='label label-success'>{% trans %}Creating the package{% endtrans %}</span>
+    <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+    <span id='submiting_release' class='label label-default'>{% trans %}Submitting the package release{% endtrans %}</span>
+  </div>
+  <hr>
+  <div class="alert alert-info">
+    <p>{% trans %}The package is created !{% endtrans %}</p>
+  </div>
+  <form method="post" action="{{ url_for("submit_new_package_release") }}" class="form-inline">
+    <input type="hidden" name="url" value="{{ url }}">
+    <input type="hidden" name="new_package" value="1">
+    <div class="form-group ">
+      <input type="submit" value="{% trans %}Continue to submit the package release...{% endtrans %}" class="btn btn-primary">
+    </div>
+  </form>
+</div>
+
+
+
+
+
+{% endblock %}
+

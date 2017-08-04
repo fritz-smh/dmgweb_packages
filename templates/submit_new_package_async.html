@@ -1,0 +1,70 @@
+{% if error != None %}
+  <div class="container">
+    <div class="alert alert-warning">
+      <p>{% trans %}Error while downloading and checking the package from : {% endtrans %} {{ url }}</p>
+      <p>{{ error | safe }}</p>
+    </div>
+
+  </div>
+
+{% else %}
+  <div class="container">
+    <div class="alert alert-info" role="alert">
+      <p>{% trans %}Package downloaded from : {% endtrans %}<a href='{{url}}'>{{url}}</a></p>
+      <p>{% trans %}Please, check the below informations and <strong>check that the given email is valid!</strong>{% endtrans %}</p>
+      <hr>
+      <p>{% trans %}This step will create the package entry in the repository. The next step will check the submitted package release.{% endtrans %}</p>
+ 
+    </div>
+  
+    <form method="post" action="{{ url_for("submit_new_package") }}" class="form-inline">
+
+      <input type="hidden" name="step" value="save">
+      <input type="hidden" name="url" value="{{ url }}">
+      <input type="hidden" name="type" value="{{ type }}">
+      <input type="hidden" name="name" value="{{ name }}">
+
+      <div class="form-group ">
+        <label class="sr-only" for="type">{% trans %}Type{% endtrans %}</label> 
+        <div class="input-group">
+          <div class="input-group-addon">{% trans %}Type :{% endtrans %}</div>
+          <input class="form-control" id="type" type="text" placeholder="{{ type }}" disabled>
+        </div>
+        <span class="help-block"></span>
+      </div>
+
+      <div class="form-group ">
+        <label class="sr-only" for="name">{% trans %}Name{% endtrans %}</label> 
+        <div class="input-group">
+          <div class="input-group-addon">{% trans %}Name :{% endtrans %}</div>
+          <input class="form-control" id="name" type="text" placeholder="{{ name }}" disabled>
+        </div>
+        <span class="help-block"></span>
+      </div>
+
+      <div class="form-group ">
+        <label class="sr-only" for="email">{% trans %}Author email{% endtrans %}</label> 
+        <div class="input-group">
+          <div class="input-group-addon">{% trans %}Author email :{% endtrans %}</div>
+          <input class="form-control" id="email" name="email" type="email" value="{{ email }}">
+        </div>
+        <span class="help-block">{% trans %}The email may be used by the Domogik team to contact you in case of questions about this package. No other usage will be done. The email will not be given to anybody or any society.{% endtrans %}</span>
+      </div>
+
+      <div class="form-group ">
+        <label class="sr-only" for="site">{% trans %}Website{% endtrans %}</label> 
+        <div class="input-group">
+          <div class="input-group-addon">{% trans %}Website :{% endtrans %}</div>
+          <input class="form-control" id="site" name="site" type="text" value="{{ site }}">
+        </div>
+        <span class="help-block">{% trans %}The website information will be in most cases the packages GitHub repository url. but if you create a website dedicated to your package, feel free to fill it.{% endtrans %}</span>
+      </div>
+  
+
+      <div class="form-group">
+        <input type="submit" value="{% trans %}Create the package{% endtrans %}" class="btn btn-primary">
+      </div>
+    </form>
+  
+  </div>
+{% endif %}
