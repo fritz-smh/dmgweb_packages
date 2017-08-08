@@ -1,0 +1,132 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+
+<script type="text/javascript">
+// to allow the user to reload by revalidating url in address bar
+// TODO : do it ?
+// TODO : do it ?
+// TODO : do it ?
+//window.history.replaceState("object or string", "{{ package_id }}", "/manage_a_package?package={{ package_id }}");
+</script>
+
+<div class="container">
+  <h1>{% trans %}Package{% endtrans %} {{ package_id }} {{ release }} - change the status to {{ new_status }}</h1>
+
+  <div class="alert alert-info">
+    <p>{% trans %}Before changing the package <strong>{{ package_id }}</strong> version <kbd>{{ release }}</kbd> to the status <kbd>{{ new_status }}</kbd>, please check the following assertions are ok!{% endtrans %}</p>
+  </div>
+
+  {% if new_status == "MANUAL_REVIEW_OK" %}
+
+      <div class="form-group form-horizontal">
+        <input type="checkbox" name="foo" value="">
+        <label class="control-label">{% trans %}The <strong>icon</strong> look is OK{% endtrans %}</label>
+        <div class="help-block">
+          <ul>
+            <li>{% trans %}The icon color is the good one, depending on the package type.{% endtrans %}</li>
+            <li>{% trans %}The font used is the good one.{% endtrans %}</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="form-group form-horizontal">
+        <input type="checkbox" name="foo" value="">
+        <label class="control-label">{% trans %}The <strong>documentation</strong> is valid{% endtrans %}</label>
+        <div class="help-block">
+          <ul>
+            <li>{% trans %}The changelog is up to date.{% endtrans %}</li>
+            <li>{% trans %}The needed dependencies are listed.{% endtrans %}</li>
+            <li>{% trans %}The documentation is updated in relation to the release changes.{% endtrans %}</li>
+          </ul>
+        </div>
+      </div>
+
+
+  {% elif new_status == "BETA" %}
+
+      <div class="form-group form-horizontal">
+        <input type="checkbox" name="foo" value="">
+        <label class="control-label">{% trans %}The package has been tested by at least one user which is not the package developper.{% endtrans %}</label>
+        <div class="help-block">
+          <ul>
+            <li>{% trans %}The developper could miss some things (prerequisites for package installation, something missing in the doc, ....{% endtrans %}</li>
+          </ul>
+        </div>
+      </div>
+
+
+  {% elif new_status == "STABLE" %}
+
+      <div class="form-group form-horizontal">
+        <input type="checkbox" name="foo" value="">
+        <label class="control-label">{% trans %}This package release is installed and tested by at least <strong>5 users</strong> on the current Domogik stable release.{% endtrans %}</label>
+        <div class="help-block">
+          <ul>
+            <li>{% trans %}The package is installed <strong>and used</strong> by the users.{% endtrans %}</li>
+            <li>{% trans %}Each user used it during a week without any issue.{% endtrans %}</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="form-group form-horizontal">
+        <input type="checkbox" name="foo" value="">
+        <label class="control-label">{% trans %}The package does not depend on a <strong>cloud service</strong>.{% endtrans %}</label>
+        <div class="help-block">
+          <ul>
+            <li>{% trans %}If the package depends on a cloud service, the online service could change its API and broke the package. So, such a package can't be set as stable.{% endtrans %}</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="form-group form-horizontal">
+        <input type="checkbox" name="foo" value="">
+        <label class="control-label">{% trans %}The package handle some hardware device that is still not public.{% endtrans %}</label>
+        <div class="help-block">
+          <ul>
+            <li>{% trans %}Some package could handle new hardware that are not yet available to public. In this case, the package can't be set as stable until the hardware is available.{% endtrans %}</li>
+          </ul>
+        </div>
+      </div>
+
+
+  {% elif new_status == "ARCHIVED" %}
+
+      <div class="form-group form-horizontal">
+        <input type="checkbox" name="foo" value="">
+        <label class="control-label">{% trans %}This package release is an old release that could still be usefull for some old Domogik releases.{% endtrans %}</label>
+      </div>
+
+
+  {% elif new_status == "DELETED" %}
+
+      <div class="form-group form-horizontal">
+        <input type="checkbox" name="foo" value="">
+        <label class="control-label">{% trans %}This package release is to be deleted. There is no way to recover it after!!{% endtrans %}</label>
+      </div>
+
+
+  {% elif new_status == "KO" %}
+
+      <div class="form-group form-horizontal">
+        <input type="checkbox" name="foo" value="">
+        <label class="control-label">{% trans %}This package release does not respect a prerequisite to go to the next status.{% endtrans %}</label>
+      </div>
+
+  {% endif %}
+
+  <form  method="post" action="{{ url_for("set_status") }}" class="form">
+    <input type="hidden" name="package" value="{{ package_id }}">
+    <input type="hidden" name="type" value="{{ type }}">
+    <input type="hidden" name="name" value="{{ name }}">
+    <input type="hidden" name="release" value="{{ release }}">
+    <input type="hidden" name="new_status" value="{{ new_status }}">
+    <div class="input-group-btn">
+      <input id="submit_new_status" type="submit" value="{% trans %}Change{% endtrans %}" class="btn btn-primary">
+    </div>
+  </form>
+
+</div>
+
+{% endblock %}
+

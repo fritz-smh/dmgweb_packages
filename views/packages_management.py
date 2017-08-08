@@ -19,6 +19,18 @@ import magic
 import zipfile
 import time
 
+# python 2 and 3
+try:
+    from urllib.request import urlopen
+    from urllib.request import retrieve
+except ImportError:
+    from urllib import urlopen
+    from urllib import urlretrieve
+
+
+
+
+
 
 
 class FormManageExistingPackage(Form):
@@ -58,15 +70,28 @@ def manage_a_package():
     form_new = FormManageNewPackage(csrf_enabled=True)
 
     try:
-        package_id = request.form['package']
-        pkg_type = package_id.split("-")[0]
-        pkg_name = package_id.split("-")[1]
-        pkg_informations = app.packages.get_informations(pkg_type, pkg_name)
+        if request.method == "POST":
+            package_id = request.form['package']
+        elif request.method ==  "GET":
+            try:
+                package_id = request.args['package']
+            except:
+                package_id = ""
+        # and no else here :)
+
+        try:
+            pkg_type = package_id.split("-")[0]
+            pkg_name = package_id.split("-")[1]
+        except:
+            pkg_type = ""
+            pkg_name = ""
 
         # special case - the package does not exists
         if not app.packages.is_package_existing(pkg_type, pkg_name):
             return render_template('manage_a_package_no_package.html',
                                    package_id = package_id)
+
+        pkg_informations = app.packages.get_informations(pkg_type, pkg_name)
 
         pkg_releases = app.packages.get_releases(pkg_type, pkg_name)
         pkg_notes = app.packages.get_notes(pkg_type, pkg_name)
@@ -119,7 +144,7 @@ def submit_new_package():
 
     # common to all steps
     try:
-        url = request.form['url']
+        url = request.form['url'].strip()
     except:
         app.logger.error(u"Error while getting url value")
         return render_template('error.html')
@@ -133,10 +158,10 @@ def submit_new_package():
     elif step == 'save':
         # get values from form
         try:
-            pkg_type = request.form['type']
-            pkg_name = request.form['name']
-            pkg_email = request.form['email']
-            pkg_site = request.form['site']
+            pkg_type = request.form['type'].strip()
+            pkg_name = request.form['name'].strip()
+            pkg_email = request.form['email'].strip()
+            pkg_site = request.form['site'].strip()
         except:
             app.logger.error(u"Error while getting some value. Error is : {0}".format(traceback.format_exc()))
             return render_template('error.html')
@@ -146,7 +171,8 @@ def submit_new_package():
             app.packages.add(pkg_type = pkg_type,
                              pkg_name = pkg_name,
                              pkg_email = pkg_email,
-                             pkg_site = pkg_site)
+                             pkg_site = pkg_site,
+                             user = g.user)
         except PackageError as e:
             app.logger.error(u"Error while creating the package. Error is : {0}".format(e.value))
             return render_template('submit_new_package_error.html',
@@ -174,7 +200,7 @@ def submit_new_package_async():
 
     ### Handle POST method
     try:
-        url = request.form['url']
+        url = request.form['url'].strip()
     except:
         app.logger.error(u"Error while getting url value")
         return render_template('error.html')
@@ -243,7 +269,7 @@ def submit_new_package_release():
 
     ### Handle POST method
     try:
-        url = request.form['url']
+        url = request.form['url'].strip()
         # new_package means that this is the first release submission and the package has just be created
         # This flag is used only for cosmetic
         if 'new_package' in request.form:
@@ -273,7 +299,7 @@ def submit_new_package_release_async():
 
     ### Handle POST method
     try:
-        url = request.form['url']
+        url = request.form['url'].strip()
     except:
         app.logger.error(u"Error while getting url value")
         return render_template('error.html')
@@ -313,7 +339,7 @@ def submit_new_package_release_async():
     # TODO : review
 
     try:
-        app.packages.add_release(pkg_type, pkg_name, pkg_release, url)
+        app.packages.add_release(pkg_type, pkg_name, pkg_release, url, g.user)
     except PackageError as e:
         msg = u"Error while adding the package. Error is : {0}".format(e.value)
         app.logger.error(msg)
@@ -326,3 +352,106 @@ def submit_new_package_release_async():
                            type = pkg_type,
                            name = pkg_name,
                            error = None)
+
+
+
+@app.route('/add_note', methods=['POST'])
+@login_required
+def add_note():
+    app.logger.debug(u"Calling /add_note")
+    app.logger.debug(u"Method='{0}', form='{1}'".format(request.method, request.form))
+
+    try:
+        app.packages.add_note(request.form['type'], 
+                              request.form['name'], 
+                              request.form['content'],
+                              g.user) 
+        return request.form['content']
+    except:
+        msg = u"Error while adding a note. Error is : {0}".format(traceback.format_exc())
+        app.logger.error(msg)
+        return msg
+
+
+@app.route('/set_status', methods=['POST'])
+@login_required
+def set_status():
+    """ To be called as an ajax call. Quick way to change a status.
+    """
+    app.logger.debug(u"Calling /set_status")
+    app.logger.debug(u"Method='{0}', form='{1}'".format(request.method, request.form))
+
+    try:
+        app.packages.set_status(request.form['type'], 
+                                request.form['name'], 
+                                request.form['release'], 
+                                request.form['new_status'],
+                                g.user) 
+        #return request.form['new_status']
+        return redirect(url_for("manage_a_package", package="{0}-{1}".format(request.form['type'], request.form['name'])))
+    except:
+        msg = u"Error while adding a note. Error is : {0}".format(traceback.format_exc())
+        app.logger.error(msg)
+        #return msg
+        return redirect(url_for("manage_a_package", package="{0}-{1}".format(request.form['type'], request.form['name'])))
+
+@app.route('/change_status', methods=['POST'])
+@login_required
+def change_status():
+    """ To be displayed before setting a new status. List the things to check before being ok
+    """
+    app.logger.debug(u"Calling /change_status")
+    app.logger.debug(u"Method='{0}', form='{1}'".format(request.method, request.form))
+    form_new = FormManageNewPackage(csrf_enabled=True)
+
+    try:
+        if request.method == "POST":
+            package_id = request.form['package']
+            pkg_type = request.form['type']
+            pkg_name = request.form['name']
+            pkg_release = request.form['release']
+            pkg_new_status = request.form['new_status']
+
+        # special case - the package does not exists
+        if not app.packages.is_package_existing(pkg_type, pkg_name):
+            return render_template('manage_a_package_no_package.html',
+                                   package_id = package_id)
+
+        pkg_informations = app.packages.get_informations(pkg_type, pkg_name)
+
+        pkg_releases = app.packages.get_releases(pkg_type, pkg_name)
+    except:
+        app.logger.error(u"Error while getting package informations. Error is : {0}".format(traceback.format_exc()))
+        # TODO: dedicated error page
+        # TODO: dedicated error page
+        # TODO: dedicated error page
+        return render_template('error.html')
+
+    return render_template('change_release_status.html', 
+                           package_id = package_id,
+                           type = pkg_type,
+                           name = pkg_name,
+                           release = pkg_release,
+                           new_status = pkg_new_status,
+                           informations = pkg_informations,
+                           releases = pkg_releases)
+
+
+@app.route('/check_url', methods=['POST'])
+@login_required
+def check_url():
+    """ As an Ajax request can't be done on another domain, we use this url to check if an url is ok (HTTP 200) or not
+    """
+    app.logger.debug(u"Calling /check_url")
+    app.logger.debug(u"Method='{0}', form='{1}'".format(request.method, request.form))
+    try:
+        url = request.form['url']
+        response = urlopen(url)
+        app.logger.debug(u"HTTP response code for url '{0}' is '{1}'".format(url, response.getcode()))
+        if response.getcode() == 200:
+            return '<span class="glyphicon glyphicon-ok" aria-hidden="true"></span> (HTTP code = {0})'.format(response.getcode())
+        else:
+            return '<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> (HTTP code = {0})'.format(response.getcode())
+    except:
+        app.logger.warning(u"Error while calling url '{0}'. Error is : {1}".format(url, traceback.format_exc()))
+        return '<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> ERROR while checking url'

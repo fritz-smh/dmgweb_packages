@@ -1,8 +1,59 @@
 {% extends "base/base.html" %}
 
 {% block content %}
+
+<style>
+.flex-container {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  
+  -webkit-flex-flow: row wrap;
+  justify-content: flex-start;
+}
+
+.flex-item {
+  padding: 5px;
+  width: 20em;
+  height: 15em;
+  margin: 0.5em;
+  text-align: center;
+}
+
+.package {
+  color: #000000;
+  background: #eeeeee;
+  border: 1px solid #005774;
+}
+
+.package h2 {
+  color: #000000;
+  font-size: 1.6em;
+  margin: 0px;
+  margin-bottom: 0.5em;
+  padding: 0px;
+}
+
+
+</style>
+
 <div class="container">
   <h1>Welcome on the <a href="http://www.domogik.org">Domogik</a> packages repository!</h1>
+
+  <div class="flex-container">
+    {% for pkg in packages %}
+    <div class="flex-item package">
+      <h2>{{ pkg.type }} {{ pkg.name }} {{ pkg.release }}</h2>
+      <img src="{{ url_for("icons", type=pkg.type, name=pkg.name, release=pkg.release) }}">
+    </div>
+    {% endfor %}
+  </div>
 
 
 </div>

@@ -5,5 +5,7 @@ from dmgweb_packages.application import app
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    packages = app.packages.get_packages_releases()
+    return render_template('index.html',
+                           packages = packages)
 

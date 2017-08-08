@@ -117,6 +117,31 @@ TODO : quid des packages comme weather qui ne peuvent etre mis en stable (cf clo
 
 
 
+
+
+Nouvel essai :
+
+                [0]---------------------> ko ------> delete
+                 |                        ^
+           auto review ok                 |
+                 |                        |
+                 |------------------------+ // la raison du ko sera dans les notes
+                 v                        ^
+         manual review ok                 |
+                 |                        |
+                 |------------------------+ 
+                 v                        ^
+                beta                      |
+                ^  |                      |
+                |  |----------------------+ 
+                |  v
+               stable
+                 |
+               archive
+                 |
+               delete
+
+
 Données
 =======
 

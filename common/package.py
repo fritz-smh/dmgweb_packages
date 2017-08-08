@@ -9,8 +9,10 @@ import zipfile
 import time
 import shutil
 import hashlib
+import datetime
 ###from dmgweb_packages.common.tweet import tweet_message
 from operator import itemgetter
+from operator import attrgetter
 
 # python 2 and 3
 try:
@@ -47,6 +49,35 @@ URL_REGEXP = re.compile(
         r'(?::\d+)?'  # optional port
         r'(?:/?|[/?]\S+)$', re.IGNORECASE)
 
+USER_SERVICE = "@system@"
+
+### Releases status
+STATUS = {
+           'AUTO_REVIEW_OK' : "Automatic review OK",
+           'MANUAL_REVIEW_OK' : "Manuel review OK",
+           'BETA' : "Beta",
+           'STABLE' : "Stable",
+           'ARCHIVED' : "Archived",
+           'KO' : "KO / refused",
+           'DELETED' : "To delete"
+         }
+
+NEXT_STATUS = {
+                'AUTO_REVIEW_OK' : ['MANUAL_REVIEW_OK', 'KO'],
+                'MANUAL_REVIEW_OK' : ['BETA', 'KO'],
+                'BETA' : ['STABLE', 'KO'],
+                'STABLE' : ['BETA', 'ARCHIVED',' KO'],
+                'ARCHIVED' : ['DELETED'],
+                'KO' : ['DELETED'],
+                'DELETED' : []
+              }
+
+
+
+def timestamp_to_datetime(date, fmt=None):
+    if fmt is None:
+        fmt = "%d %B %Y, %H:%M"
+    return format(datetime.datetime.fromtimestamp(date), fmt)
 
 
 class PackageError(Exception):
@@ -221,6 +252,15 @@ class Packages():
         return sorted(pkg_list)
     
 
+    def get_packages_releases(self):
+        """ Return all packages releases
+        """
+        pkg_rel_list = []
+        for pkg in self.json:
+            pkg_rel_list.extend(pkg['releases'])
+        return pkg_rel_list
+
+       
     def is_package_existing(self, pkg_type, pkg_name):
         for pkg in self.json:
            if pkg["type"] == pkg_type and pkg["name"] == pkg_name:
@@ -240,15 +280,16 @@ class Packages():
             raise Exception(msg)
     
 
-    def add(self, pkg_type, pkg_name, pkg_email, pkg_site):
+    def add(self, pkg_type, pkg_name, pkg_email, pkg_site, user):
         """ add a package (not a package release) to the list
         """
-        self.logger.info("Add a package (not a release) : '{0}_{1}' by '{2}', website is '{3}'".format(pkg_type, pkg_name, pkg_email, pkg_site))
+        self.logger.info("Add a package (not a release) : '{0}_{1}' by '{2} / {3}', website is '{4}'".format(pkg_type, pkg_name, pkg_email, user, pkg_site))
         pkg_data = {
                      'package_id' : '{0}-{1}'.format(pkg_type, pkg_name),
                      'type' : pkg_type,
                      'name' : pkg_name,
                      'author_email' : pkg_email,
+                     'submitter' : user,
                      'site' : pkg_site,
                      'is_new' : True,
                      'releases' : [],
@@ -265,20 +306,28 @@ class Packages():
                raise PackageError(msg)
         # add in the list
         self.json.append(pkg_data)
+        self.add_note(pkg_type=pkg_type, 
+                      pkg_name=pkg_name, 
+                      content = u"<kbd>Package created</kbd>",
+                      user = user,
+                      do_save=False)
         self.save()
         msg = "New package created : '{0}_{1}'".format(pkg_type, pkg_name)
         self.logger.info(msg)
 
-    def add_release(self, pkg_type, pkg_name, pkg_release, pkg_url):
+    def add_release(self, pkg_type, pkg_name, pkg_release, pkg_url, user):
         """
            package format : 
               {
+                'type' : 'plugin',   // yes, duplicate of package, but easier to process
+                'name' : 'weather',   // yes, duplicate of package, but easier to process
                 'release' : '1.1',
                 'url_package' : 'http://......',
                 'url_documentation' : 'http://......',
                 'url_tests' : 'http://......',
                 'url_review' : '/reviews/plugin_weather_1.1.html',
-                'status' : 'SUBMITTED',    // values : .....
+                'status' : 'AUTO_REVIEW_OK',    // values : .....
+                'next_status' : NEXT_STATUS['AUTO_REVIEW_OK'],
                 'timestamp' : 1234567890
               }
         """
@@ -294,20 +343,29 @@ class Packages():
                            raise PackageError(msg)
     
                    # add package release to the list of releases
-                   pkg_helper = PackageHelper(self.logger, pkg_type, pkg_name, pkg_url)
+                   pkg_helper = PackageHelper(self.logger, pkg_type, pkg_name, pkg_url, pkg_release)
                    pkg_url_doc = pkg_helper.find_documentation_url()
                    pkg_url_tests = pkg_helper.find_travis_ci_status_image_url()
                    review_file = pkg_helper.get_review_file()
                    pkg_data = {
+                                'type' : pkg_type,
+                                'name' : pkg_name,
                                 'release' : pkg_release,
                                 'url_package' : pkg_url,
                                 'url_documentation' : pkg_url_doc,
                                 'url_tests' : pkg_url_tests,
                                 'review' : review_file,
-                                'status' : 'TO_REVIEW',
+                                'status' : 'AUTO_REVIEW_OK',
+                                'next_status' : NEXT_STATUS['AUTO_REVIEW_OK'],
+                                'submitter' : user,
                                 'timestamp' : time.time()
                               }
                    pkg['releases'].append(pkg_data)
+                   self.add_note(pkg_type=pkg_type, 
+                                 pkg_name=pkg_name, 
+                                 content = u"<kbd>New release '{0}'</kbd>".format(pkg_release),
+                                 user = user,
+                                 do_save=False)
                    self.save()
                    msg = u"New package release added : '{0}_{1}' version '{2}' from url '{3}'".format(pkg_type, pkg_name, pkg_release, pkg_url)
                    self.logger.info(msg)
@@ -332,7 +390,7 @@ class Packages():
         """
         for pkg in self.json:
            if pkg["type"] == pkg_type and pkg["name"] == pkg_name:
-               return pkg['releases']
+               return sorted(pkg['releases'], key=itemgetter('release'), reverse = True)
         return []
             
     def get_notes(self, pkg_type, pkg_name):
@@ -340,8 +398,53 @@ class Packages():
         """
         for pkg in self.json:
            if pkg["type"] == pkg_type and pkg["name"] == pkg_name:
-               return pkg['notes']
+               return sorted(pkg['notes'], key=itemgetter('timestamp'), reverse = True)
         return []
+
+    def add_note(self, pkg_type, pkg_name, content, user=None, do_save=True):
+        """ Add a note to a package
+            The do_save option allows to not save in case this function is called from another one that will make the save action
+        """
+        if user is None:
+            user = "Anonymous"
+        self.logger.debug(u"Try to add a note to '{0}-{1}' with content '{2}' from '{3}'".format(pkg_type, pkg_name, content, user))
+        for pkg in self.json:
+            if pkg["type"] == pkg_type and pkg["name"] == pkg_name:
+                self.logger.debug(u"Add a note to '{0}-{1}' with content '{2}' from '{3}'".format(pkg_type, pkg_name, content, user))
+                pkg['notes'].append({
+                                      'author' : user,
+                                      'content' : content,
+                                      'timestamp' : time.time()
+                                    })
+                if do_save:
+                    self.save()
+                return True
+        return False
+
+    def set_status(self, pkg_type, pkg_name, pkg_release, new_status, user=None):
+        """ Change a package status
+        """
+        if user is None:
+            user = "Anonymous"
+        self.logger.debug(u"Try to change the status of '{0}-{1}' version '{2}' to '{3}' from '{4}'".format(pkg_type, pkg_name, pkg_release, new_status, user))
+        for pkg in self.json:
+            if pkg["type"] == pkg_type and pkg["name"] == pkg_name:
+                for rel in pkg["releases"]:
+                    if rel["release"] == pkg_release:
+                        # TODO : check if the change can be done
+                        # TODO : check if the change can be done
+                        # TODO : check if the change can be done
+                        self.logger.debug(u"Change the status of '{0}-{1}' version '{2}' to '{3}' from '{4}'".format(pkg_type, pkg_name, pkg_release, new_status, user))
+                        rel['status'] = new_status
+                        rel['next_status'] = NEXT_STATUS[new_status]
+                        self.add_note(pkg_type=pkg_type, 
+                                      pkg_name=pkg_name, 
+                                      content = u"Version <kbd>{0}</kbd> status set to <kbd>{1}</kbd>".format(pkg_release, new_status),
+                                      user = user,
+                                      do_save=False)
+                        self.save()
+                        return True
+        return False
 
     def get_issues(self, pkg_type, pkg_name):
         """ Return a list of the issues
@@ -361,37 +464,57 @@ class Packages():
         pkg_helper = PackageHelper(self.logger, pkg_type, pkg_name)
         return pkg_helper.get_open_pull_requests()
 
+
             
 
 class PackageHelper:
     """ A helper class to automatically find usefull data from a package release url/type/name
     """
 
-    def __init__(self, logger, pkg_type, pkg_name, pkg_url = None):
-        self.github_url_prefix = "https://github.com/"
+    def __init__(self, logger, pkg_type, pkg_name, pkg_url = None, pkg_release = None):
 
         self.logger = logger
         self.type = pkg_type
         self.name = pkg_name
+        self.release = pkg_release
         self.url = pkg_url  # url of release, not of package's website
 
         # TODO : dirty to do this as this is Package() that calls PackageHelper...
         self.packages = Packages(self.logger)
         self.pkg_info = self.packages.get_informations(pkg_type, pkg_name)
 
-        # TODO : get website url and check if this is a github one
+        # if the website is a github url, get the repo and user from it
+        self.github_url_prefix = "https://github.com/"
+        self.user = None
+        self.repo = None
+        try:
+            self.logger.debug(u"Try to find Github informations (user, repo) for '{0}-{1}' from url '{2}'".format(self.type, self.name, self.pkg_info['site']))
+            if not self.pkg_info['site'].startswith(self.github_url_prefix):
+                self.logger.info(u"'{0}-{1}' website is not a Github one : '{2}'. The informations can't be retrieved".format(self.type, self.name, self.pkg_info['site']))
+      
+            else:
+                self.user = self.pkg_info['site'].split("/")[3]
+                self.repo = self.pkg_info['site'].split("/")[4]
+
+        except:
+            self.logger.error(u"Error while trying to find Github informations for '{0}-{1}'. Error is : {2}".format(self.type, self.name, traceback.format_exc()))
 
     def find_documentation_url(self):
         """
            return : url
         """
-        return "http://TODO/doc"
+        url = "http://domogik-{0}-{1}.readthedocs.io/en/{2}/".format(self.type, self.name, self.release)
+        return url
 
     def find_travis_ci_status_image_url(self):
         """
            return : url of a picture
         """
-        return "http://TODO/travis"
+        if self.user is None:
+            self.logger.info(u"'{0}-{1}' website is not a Github one : '{2}'. The Travis CI url can't be built.".format(self.type, self.name, self.pkg_info['site']))
+            return "/static/images/no-tests.png"
+        url = "https://travis-ci.org/{0}/{1}.svg?branch={2}".format(self.user, self.repo, self.release)
+        return url
 
     def get_review_file(self):
         """
@@ -405,13 +528,10 @@ class PackageHelper:
         resp = None
         try:
             self.logger.debug(u"Try to find Github url to create a new issue for '{0}-{1}' from url '{2}'".format(self.type, self.name, self.pkg_info['site']))
-            if not self.pkg_info['site'].startswith(self.github_url_prefix):
-                self.logger.info(u"'{0}-{1}' website is not a Github one : '{2}'. The issues can't be retrieved".format(self.type, self.name, self.pkg_info['site']))
-                return []
+            if self.user is None:
+                return None
       
-            user = self.pkg_info['site'].split("/")[3]
-            repo = self.pkg_info['site'].split("/")[4]
-            url = "https://github.com/{0}/{1}/issues/new".format(user, repo)
+            url = "https://github.com/{0}/{1}/issues/new".format(self.user, self.repo)
             resp = url
 
         except:
@@ -427,13 +547,11 @@ class PackageHelper:
         resp = []
         try:
             self.logger.debug(u"Try to find Github issues for '{0}-{1}' from url '{2}'".format(self.type, self.name, self.pkg_info['site']))
-            if not self.pkg_info['site'].startswith(self.github_url_prefix):
+            if self.user is None:
                 self.logger.info(u"'{0}-{1}' website is not a Github one : '{2}'. The issues can't be retrieved".format(self.type, self.name, self.pkg_info['site']))
-                return []
+                return [u"The website is not a Github one. No issue retrieved"]
       
-            user = self.pkg_info['site'].split("/")[3]
-            repo = self.pkg_info['site'].split("/")[4]
-            url = "https://api.github.com/repos/{0}/{1}/issues".format(user, repo)
+            url = "https://api.github.com/repos/{0}/{1}/issues".format(self.user, self.repo)
 
             self.logger.debug(u"Calling Github API : '{0}'".format(url))
             issues_json = []
@@ -451,6 +569,7 @@ class PackageHelper:
                 
         except:
             self.logger.error(u"Error while trying to find Github issues for '{0}-{1}'. Error is : {2}".format(self.type, self.name, traceback.format_exc()))
+            resp = [u"An error occured... Please check the logs"]
         return resp
 
 
@@ -461,13 +580,11 @@ class PackageHelper:
         resp = []
         try:
             self.logger.debug(u"Try to find Github pull requests for '{0}-{1}' from url '{2}'".format(self.type, self.name, self.pkg_info['site']))
-            if not self.pkg_info['site'].startswith(self.github_url_prefix):
+            if self.user is None:
                 self.logger.info(u"'{0}-{1}' website is not a Github one : '{2}'. The pull requests can't be retrieved".format(self.type, self.name, self.pkg_info['site']))
-                return []
+                return [u"The website is not a Github one. No pull request retrieved"]
       
-            user = self.pkg_info['site'].split("/")[3]
-            repo = self.pkg_info['site'].split("/")[4]
-            url = "https://api.github.com/repos/{0}/{1}/pulls".format(user, repo)
+            url = "https://api.github.com/repos/{0}/{1}/pulls".format(self.user, self.repo)
 
             self.logger.debug(u"Calling Github API : '{0}'".format(url))
             pulls_json = []
@@ -485,4 +602,5 @@ class PackageHelper:
                 
         except:
             self.logger.error(u"Error while trying to find Github pull requests for '{0}-{1}'. Error is : {2}".format(self.type, self.name, traceback.format_exc()))
+            resp = [u"An error occured... Please check the logs"]
         return resp
