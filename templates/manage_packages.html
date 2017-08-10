@@ -11,7 +11,7 @@
 
   <h2>{% trans %}Select an existing package{% endtrans %}</h2>
   <form method="post" action="{{ url_for("manage_a_package") }}" class="form-inline">
-    <div class="form-group ">
+    <div class="">
       <label class="sr-only" for="package">{% trans %}Select an existing package{% endtrans %}</label> 
       <div class="input-group">
         <div class="input-group-addon">{% trans %}Package :{% endtrans %}</div>
@@ -26,7 +26,7 @@
 
   <h2>{% trans %}Or create a new one{% endtrans %}</h2>
   <form method="post" action="{{ url_for("submit_new_package") }}" class="form-inline">
-    <div class="form-group ">
+    <div class="">
       <label class="sr-only" for="package">{% trans %}Package release url{% endtrans %}</label> 
       <div class="input-group">
         <div class="input-group-addon">{% trans %}Package release url :{% endtrans %}</div>

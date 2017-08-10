@@ -115,7 +115,8 @@ def manage_a_package():
                            notes = pkg_notes,
                            new_issue_url = pkg_new_issue_url,
                            issues = pkg_issues,
-                           pull_requests = pkg_pull_requests)
+                           pull_requests = pkg_pull_requests,
+                           domogik_releases = app.domogik_releases)
 
 
 
@@ -325,9 +326,13 @@ def submit_new_package_release_async():
 
     # Get needed informations from the json
     try:
-        pkg_type =  pkg_checker.get_json()["identity"]["type"]
-        pkg_name =  pkg_checker.get_json()["identity"]["name"]
-        pkg_release =  pkg_checker.get_json()["identity"]["version"]
+        pkg_type = pkg_checker.get_json()["identity"]["type"]
+        pkg_name = pkg_checker.get_json()["identity"]["name"]
+        pkg_release = pkg_checker.get_json()["identity"]["version"]
+        pkg_author = pkg_checker.get_json()["identity"]["author"]
+        pkg_description = pkg_checker.get_json()["identity"]["description"]
+        pkg_tags = pkg_checker.get_json()["identity"]["tags"]
+        pkg_domogik_min_release = pkg_checker.get_json()["identity"]["domogik_min_version"]
     except:
         msg = u"Error while getting informations from json. Error is : {0}".format(traceback.format_exc())
         app.logger.error(msg)
@@ -339,7 +344,15 @@ def submit_new_package_release_async():
     # TODO : review
 
     try:
-        app.packages.add_release(pkg_type, pkg_name, pkg_release, url, g.user)
+        app.packages.add_release(pkg_type, 
+                                 pkg_name, 
+                                 pkg_release, 
+                                 url, 
+                                 pkg_author, 
+                                 pkg_tags, 
+                                 pkg_description, 
+                                 pkg_domogik_min_release, 
+                                 g.user)
     except PackageError as e:
         msg = u"Error while adding the package. Error is : {0}".format(e.value)
         app.logger.error(msg)
@@ -386,6 +399,28 @@ def set_status():
                                 request.form['name'], 
                                 request.form['release'], 
                                 request.form['new_status'],
+                                g.user) 
+        #return request.form['new_status']
+        return redirect(url_for("manage_a_package", package="{0}-{1}".format(request.form['type'], request.form['name'])))
+    except:
+        msg = u"Error while adding a note. Error is : {0}".format(traceback.format_exc())
+        app.logger.error(msg)
+        #return msg
+        return redirect(url_for("manage_a_package", package="{0}-{1}".format(request.form['type'], request.form['name'])))
+
+@app.route('/set_domogik_max_release', methods=['POST'])
+@login_required
+def set_domogik_max_release():
+    """ To be called as an ajax call. Quick way to change a domogik max release for a package release
+    """
+    app.logger.debug(u"Calling /set_domogik_max_release")
+    app.logger.debug(u"Method='{0}', form='{1}'".format(request.method, request.form))
+
+    try:
+        app.packages.set_domogik_max_release(request.form['type'], 
+                                request.form['name'], 
+                                request.form['release'], 
+                                request.form['max_release'],
                                 g.user) 
         #return request.form['new_status']
         return redirect(url_for("manage_a_package", package="{0}-{1}".format(request.form['type'], request.form['name'])))

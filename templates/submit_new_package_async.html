@@ -17,14 +17,14 @@
  
     </div>
   
-    <form method="post" action="{{ url_for("submit_new_package") }}" class="form-inline">
+    <form method="post" action="{{ url_for("submit_new_package") }}" class="">
 
       <input type="hidden" name="step" value="save">
       <input type="hidden" name="url" value="{{ url }}">
       <input type="hidden" name="type" value="{{ type }}">
       <input type="hidden" name="name" value="{{ name }}">
 
-      <div class="form-group ">
+      <div class="form-inline ">
         <label class="sr-only" for="type">{% trans %}Type{% endtrans %}</label> 
         <div class="input-group">
           <div class="input-group-addon">{% trans %}Type :{% endtrans %}</div>
@@ -33,7 +33,7 @@
         <span class="help-block"></span>
       </div>
 
-      <div class="form-group ">
+      <div class="form-inline ">
         <label class="sr-only" for="name">{% trans %}Name{% endtrans %}</label> 
         <div class="input-group">
           <div class="input-group-addon">{% trans %}Name :{% endtrans %}</div>
@@ -42,7 +42,7 @@
         <span class="help-block"></span>
       </div>
 
-      <div class="form-group ">
+      <div class="form-inline ">
         <label class="sr-only" for="email">{% trans %}Author email{% endtrans %}</label> 
         <div class="input-group">
           <div class="input-group-addon">{% trans %}Author email :{% endtrans %}</div>
@@ -51,7 +51,7 @@
         <span class="help-block">{% trans %}The email may be used by the Domogik team to contact you in case of questions about this package. No other usage will be done. The email will not be given to anybody or any society.{% endtrans %}</span>
       </div>
 
-      <div class="form-group ">
+      <div class="form-inline ">
         <label class="sr-only" for="site">{% trans %}Website{% endtrans %}</label> 
         <div class="input-group">
           <div class="input-group-addon">{% trans %}Website :{% endtrans %}</div>

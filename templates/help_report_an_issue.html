@@ -1,0 +1,26 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+
+<div class="container">
+  <h1>{% trans %}Help - Report an issue {% endtrans %}</h1>
+
+  {% if new_issue_url == None %}
+    <p>{% trans %}The <strong>{{ type }} {{ name }}</strong> website if not a Github one. So we are not able to give you the URL where you can create an issue. Please go on the package website and search for a way to report an issue to the package developper.{% endtrans %}</p>
+  {% else %}
+    <p>{% trans %}If you encountered an issue about the <strong>{{ type }} {{ name }}</strong> (release {{ release }}), you can report it in our bugtracker, so we will be able to fix the issue.{% endtrans %}
+
+    <p>{% trans %}You will need a <a href="https://www.github.com">GitHub account</a> to create the issue.{% endtrans %}</p>
+
+    <div>
+      <a href="{{ new_issue_url }}" class="btn btn-danger">{% trans %}Click here to create the issue{% endtrans %}</a>
+    </div>
+  {% endif %}
+
+  <hr>
+  <p>{% trans %}Of course, you can join us also on Twitter as <strong>@domogik</strong> or come speak with us on IRC at <strong>#domogik@chat.freenode.net</strong>. Find below a direct access to our irc channel.{% endtrans %}</p>
+
+  <iframe src="http://webchat.freenode.net?randomnick=1&channels=%23domogik&uio=d4" width="647" height="400"></iframe>
+</div>
+{% endblock %}
+

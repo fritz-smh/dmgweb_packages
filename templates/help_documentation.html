@@ -1,0 +1,30 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+
+<div class="container">
+  <h1>{% trans %}Help - Documentation {% endtrans %}</h1>
+
+  <h2>{% trans %}The documentation link is KO{% endtrans %}</h2>
+
+  <p>{% trans %}First, make sure that you followed the Domogik documentation to <strong>publish your package documentation</strong> on <a href="http://www.readthedocs.org">Read The Docs</a>{% endtrans %}</p>
+
+  <p>{% trans %}If you already did it, you have forgotten to <strong>activate the documentation for the release</strong> of the submitted package.{% endtrans %}</p>
+
+  <p>{% trans %}To do this, connect on Read The Docs website. And go in the <strong>Admin</strong> menu in the top bar :{% endtrans %}</p>
+
+  <img src="/static/images/help/help_documentation_01.jpg" class="img-thumbnail img-doc">
+
+  <p>{% trans %}Then, go in the <strong>Versions</strong> menu on the left.{% endtrans %}</p>
+
+  <img src="/static/images/help/help_documentation_02.jpg" class="img-thumbnail img-doc">
+
+  <p>{% trans %}And activate the versions like this :{% endtrans %}</p>
+
+  <img src="/static/images/help/help_documentation_03.jpg" class="img-thumbnail img-doc">
+
+  <p>{% trans %}Set latest as the default version, uncheck stable and master and make sure to activate the version published (1.9 in this example).{% endtrans %}</p>
+
+</div>
+{% endblock %}
+

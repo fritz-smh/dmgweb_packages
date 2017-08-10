@@ -252,6 +252,12 @@ class Packages():
         return sorted(pkg_list)
     
 
+    def get_packages(self):
+        """ Return all packages
+        """
+        return self.json
+
+       
     def get_packages_releases(self):
         """ Return all packages releases
         """
@@ -315,7 +321,7 @@ class Packages():
         msg = "New package created : '{0}_{1}'".format(pkg_type, pkg_name)
         self.logger.info(msg)
 
-    def add_release(self, pkg_type, pkg_name, pkg_release, pkg_url, user):
+    def add_release(self, pkg_type, pkg_name, pkg_release, pkg_url, pkg_author, pkg_tags, pkg_description, pkg_domogik_min_release, user):
         """
            package format : 
               {
@@ -328,6 +334,10 @@ class Packages():
                 'url_review' : '/reviews/plugin_weather_1.1.html',
                 'status' : 'AUTO_REVIEW_OK',    // values : .....
                 'next_status' : NEXT_STATUS['AUTO_REVIEW_OK'],
+                'author' : ...,
+                'tags' : ...,
+                'description' : ...,
+                'domogik_min_release' : ...,
                 'timestamp' : 1234567890
               }
         """
@@ -345,7 +355,8 @@ class Packages():
                    # add package release to the list of releases
                    pkg_helper = PackageHelper(self.logger, pkg_type, pkg_name, pkg_url, pkg_release)
                    pkg_url_doc = pkg_helper.find_documentation_url()
-                   pkg_url_tests = pkg_helper.find_travis_ci_status_image_url()
+                   pkg_url_tests_img = pkg_helper.find_travis_ci_status_image_url()
+                   pkg_url_tests = pkg_helper.find_travis_ci_url()
                    review_file = pkg_helper.get_review_file()
                    pkg_data = {
                                 'type' : pkg_type,
@@ -353,10 +364,15 @@ class Packages():
                                 'release' : pkg_release,
                                 'url_package' : pkg_url,
                                 'url_documentation' : pkg_url_doc,
+                                'url_tests_img' : pkg_url_tests_img,
                                 'url_tests' : pkg_url_tests,
                                 'review' : review_file,
                                 'status' : 'AUTO_REVIEW_OK',
                                 'next_status' : NEXT_STATUS['AUTO_REVIEW_OK'],
+                                'author' : pkg_author,
+                                'tags' : pkg_tags,
+                                'description' : pkg_description,
+                                'domogik_min_release' : pkg_domogik_min_release,
                                 'submitter' : user,
                                 'timestamp' : time.time()
                               }
@@ -446,6 +462,27 @@ class Packages():
                         return True
         return False
 
+    def set_domogik_max_release(self, pkg_type, pkg_name, pkg_release, max_release, user=None):
+        """ Set a domogik max release to handle broken compatiblity
+        """
+        if user is None:
+            user = "Anonymous"
+        self.logger.debug(u"Try to set the Domogik max compliant release of '{0}-{1}' version '{2}' to '{3}' from '{4}'".format(pkg_type, pkg_name, pkg_release, max_release, user))
+        for pkg in self.json:
+            if pkg["type"] == pkg_type and pkg["name"] == pkg_name:
+                for rel in pkg["releases"]:
+                    if rel["release"] == pkg_release:
+                        self.logger.debug(u"Change the Domogik max compliant release of '{0}-{1}' version '{2}' to '{3}' from '{4}'".format(pkg_type, pkg_name, pkg_release, max_release, user))
+                        rel['domogik_max_release'] = max_release
+                        self.add_note(pkg_type=pkg_type, 
+                                      pkg_name=pkg_name, 
+                                      content = u"Version <kbd>{0}</kbd> Domogik max compliant release set to <kbd>{1}</kbd>".format(pkg_release, max_release),
+                                      user = user,
+                                      do_save=False)
+                        self.save()
+                        return True
+        return False
+
     def get_issues(self, pkg_type, pkg_name):
         """ Return a list of the issues
         """
@@ -508,12 +545,22 @@ class PackageHelper:
 
     def find_travis_ci_status_image_url(self):
         """
-           return : url of a picture
+           return : url of a picture or None
         """
         if self.user is None:
             self.logger.info(u"'{0}-{1}' website is not a Github one : '{2}'. The Travis CI url can't be built.".format(self.type, self.name, self.pkg_info['site']))
-            return "/static/images/no-tests.png"
+            return None
         url = "https://travis-ci.org/{0}/{1}.svg?branch={2}".format(self.user, self.repo, self.release)
+        return url
+
+    def find_travis_ci_url(self):
+        """
+           return : url
+        """
+        if self.user is None:
+            self.logger.info(u"'{0}-{1}' website is not a Github one : '{2}'. The Travis CI url can't be built.".format(self.type, self.name, self.pkg_info['site']))
+            return None
+        url = "https://travis-ci.org/{0}/{1}/branches".format(self.user, self.repo)
         return url
 
     def get_review_file(self):

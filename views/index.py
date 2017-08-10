@@ -5,7 +5,10 @@ from dmgweb_packages.application import app
 
 @app.route('/')
 def index():
-    packages = app.packages.get_packages_releases()
+    #packages = app.packages.get_packages_releases()
+    domogik_releases = app.domogik_releases
+    packages = app.packages.get_packages()
     return render_template('index.html',
+                           domogik_releases = domogik_releases,
                            packages = packages)
 

@@ -1,0 +1,12 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+
+<div class="container">
+  <h1>{% trans %}Help - Domogik max release {% endtrans %}</h1>
+
+  <p>{% trans %}In most cases, there is no need to set a Domogik max release. This can be usefull <strong>only if a new Domogik release break some compatibility with some features used by a package release</strong>. In this case, just set the Domogik max release to the appropriate value from the packages management page (this can't be done in the package info.json file as when the package is developped, there is no way to be aware of the compatibility breakout).{% endtrans %}</p>
+
+</div>
+{% endblock %}
+

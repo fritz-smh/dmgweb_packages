@@ -3,6 +3,8 @@
 {% block content %}
 
 <style>
+
+/*** Grid with flew ***/
 .flex-container {
   padding: 0;
   margin: 0;
@@ -20,24 +22,138 @@
 
 .flex-item {
   padding: 5px;
-  width: 20em;
-  height: 15em;
+  width: 180px;
+  height: 150px;
   margin: 0.5em;
   text-align: center;
 }
 
+/*** Packages list items ***/
 .package {
   color: #000000;
   background: #eeeeee;
   border: 1px solid #005774;
+  margin-bottom: 2em;
+  position: relative;
 }
 
-.package h2 {
+.package .title {
   color: #000000;
   font-size: 1.6em;
   margin: 0px;
+  margin-top: 0.5em;
   margin-bottom: 0.5em;
   padding: 0px;
+}
+
+/*** Tags ***/
+
+.tag {
+  display: inline-block;
+}
+
+.btn {
+  display: inline-block;
+  margin-bottom: 1em;
+}
+
+h3 {
+  margin-top: 0px;
+}
+
+/*** Ribbons ***/
+/* from http://www.cssportal.com/css-ribbon-generator/ */
+
+/* STABLE */
+
+.ribbon_stable {
+  position: absolute;
+  right: -5px; top: -5px;
+  z-index: 1;
+  overflow: hidden;
+  width: 75px; height: 75px;
+  text-align: right;
+}
+.ribbon_stable span {
+  font-size: 10px;
+  font-weight: bold;
+  color: #FFF;
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 20px;
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+  width: 100px;
+  display: block;
+  background: #79A70A;
+  background: linear-gradient(#2989d8 0%, #1e5799 100%);
+  box-shadow: 0 3px 10px -5px rgba(0, 0, 0, 1);
+  position: absolute;
+  top: 19px; right: -21px;
+}
+.ribbon_stable span::before {
+  content: "";
+  position: absolute; left: 0px; top: 100%;
+  z-index: -1;
+  border-left: 3px solid #1e5799;
+  border-right: 3px solid transparent;
+  border-bottom: 3px solid transparent;
+  border-top: 3px solid #1e5799;
+}
+.ribbon_stable span::after {
+  content: "";
+  position: absolute; right: 0px; top: 100%;
+  z-index: -1;
+  border-left: 3px solid transparent;
+  border-right: 3px solid #1e5799;
+  border-bottom: 3px solid transparent;
+  border-top: 3px solid #1e5799;
+}
+
+/* BETA */
+
+.ribbon_beta {
+  position: absolute;
+  right: -5px; top: -5px;
+  z-index: 1;
+  overflow: hidden;
+  width: 75px; height: 75px;
+  text-align: right;
+}
+.ribbon_beta span {
+  font-size: 10px;
+  font-weight: bold;
+  color: #FFF;
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 20px;
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+  width: 100px;
+  display: block;
+  background: #79A70A;
+  background: linear-gradient(#F79E05 0%, #8F5408 100%);
+  box-shadow: 0 3px 10px -5px rgba(0, 0, 0, 1);
+  position: absolute;
+  top: 19px; right: -21px;
+}
+.ribbon_beta span::before {
+  content: "";
+  position: absolute; left: 0px; top: 100%;
+  z-index: -1;
+  border-left: 3px solid #8F5408;
+  border-right: 3px solid transparent;
+  border-bottom: 3px solid transparent;
+  border-top: 3px solid #8F5408;
+}
+.ribbon_beta span::after {
+  content: "";
+  position: absolute; right: 0px; top: 100%;
+  z-index: -1;
+  border-left: 3px solid transparent;
+  border-right: 3px solid #8F5408;
+  border-bottom: 3px solid transparent;
+  border-top: 3px solid #8F5408;
 }
 
 
@@ -48,9 +164,90 @@
 
   <div class="flex-container">
     {% for pkg in packages %}
-    <div class="flex-item package">
-      <h2>{{ pkg.type }} {{ pkg.name }} {{ pkg.release }}</h2>
-      <img src="{{ url_for("icons", type=pkg.type, name=pkg.name, release=pkg.release) }}">
+    <button class="flex-item package" type="button" data-toggle="modal" data-target="#modal-{{ pkg.type }}-{{ pkg.name }}">
+      <img src="{{ url_for("icons", type=pkg.type, name=pkg.name) }}">
+      <div class="title text-center">{{ pkg.type }} {{ pkg.name }}</div>
+    </button>
+
+    <div class="modal fade" id="modal-{{ pkg.type }}-{{ pkg.name }}" tabindex="-1" role="dialog" aria-labelledby="modal-{{ pkg.type }}-{{ pkg.name }}">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h2 class="modal-title" id="myModalLabel">{{ pkg.type }} {{ pkg.name }}</h2>
+          </div>
+          <div class="modal-body">
+            TODO : tri par release dec.
+            {% for release in pkg.releases %}
+              {# Filter on the release status #}
+              {% if release.status in ['BETA', 'STABLE'] %}
+                <div class="package panel">
+                  <div class="ribbon_{{ release.status | lower }}"><span>{{ release.status }}</span></div>
+                  <div class="panel-body">
+                  <table class="table">
+                    <tr>
+                      <td>
+                        <img src="{{ url_for("icons", type=pkg.type, name=pkg.name, release=release.release ) }}" class="pull-left">
+                      </td>
+                      <td>
+                        <h3>{{ release.release }}</h3>
+                        <p>{{ release.description }}</p>
+                        <div>
+                          {% for tag in release.tags %}
+                            <span class="tag label label-default">{{ tag }}</span>
+                          {% endfor %}
+                        </div>
+                      </td>
+                    </tr>
+                  </table>
+                  <div>
+                    <a class="btn btn-default" href="{{ release.url_documentation }}"><span class="glyphicon glyphicon-book" aria-hidden="true"></span> {% trans %}Documentation{% endtrans %}</a>
+                    <a class="btn btn-default" href="{{ pkg.site }}"><span class="glyphicon glyphicon-globe" aria-hidden="true"></span> {% trans %}Web site{% endtrans %}</a>
+                  </div>
+                  <div class="alert alert-info">
+                    <p>{% trans %}Installation : {% endtrans %}</p>
+                    <pre>dmg_package -i {{ release.url_package }}</pre>
+                  </div>
+                  <div>
+                    {% trans %}Domogik releases compliance : {% endtrans %}
+                    {% set compliant = 0 %}
+                    {% for dmg_release in domogik_releases %}
+                      {% if dmg_release == release.domogik_min_release %}
+                        {% set compliant = 1 %}
+                      {% endif %}
+                      <span class="tag label label-{% if compliant == 1 %}success{% else %}default{% endif %}">{{ dmg_release }}</span>
+                      {% if dmg_release == release.domogik_max_release %}
+                        {% set compliant = 0 %}
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                  <div>
+                    {% trans %}Published on {% endtrans %} 
+                    <em>{{ release.timestamp | datetime }}</em> 
+                    {% trans %} by {% endtrans %}
+                    <em>{{ release.author }}</em>
+                    <form  method="post" action="{{ url_for("help_report_an_issue") }}" class="form pull-right">
+                      <input type="hidden" name="type" value="{{ pkg.type }}">
+                      <input type="hidden" name="name" value="{{ pkg.name }}">
+                      <input type="hidden" name="release" value="{{ release.release }}">
+                      <div class="form-group ">
+                        <div class="input-group">
+                          <button id="report_an_issue" type="submit" class="btn btn-default"><span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span> {% trans %}Report an issue{% endtrans %}</button>
+                        </div>
+                      </div>
+                    </form>
+
+                  </div>
+                  </div>
+                </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
     </div>
     {% endfor %}
   </div>

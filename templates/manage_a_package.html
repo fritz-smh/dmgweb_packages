@@ -2,6 +2,13 @@
 
 {% block content %}
 
+<style>
+/*** override label margin ***/
+.tag {
+  display: inline-block;
+}
+</style>
+
 <script type="text/javascript">
 // to allow the user to reload by revalidating url in address bar
 window.history.replaceState("object or string", "{{ package_id }}", "/manage_a_package?package={{ package_id }}");
@@ -51,14 +58,24 @@ window.history.replaceState("object or string", "{{ package_id }}", "/manage_a_p
   <div class="row">
     <div class="col col-md-5">
       {% for release in releases %}
-        <div class="panel panel-primary">
+        <div class="panel panel-{% if release.status in ['STABLE'] %}primary{% else %}info{% endif %}">
           <div class="panel-heading">
-            <h3 class="panel-title">{% trans %}Release {% endtrans %}{{ release.release }}</h3>
-          </div>
-          <div class="panel-body">
-            <img src="{{ url_for("icons", type=type, name=name, release=release.release) }}"> 
+            <h3 class="panel-title">{% trans %}Release {% endtrans %}{{ release.release }}<span class="pull-right">{{ release.status }}</span></h3>
           </div>
           <table class="table">
+            <tr>
+              <td>
+                <img src="{{ url_for("icons", type=type, name=name, release=release.release) }}" class="pull-left"> 
+              </td>
+              <td>
+                <p>{{ release.description }}</p>
+                <p>
+                  {% for tag in release.tags %} 
+                    <span class="tag label label-default">{{ tag }}</span>
+                  {% endfor %}
+                </p>
+              </td>
+            </tr>
             <tr>
               <td>{% trans %}Status{% endtrans %}</td>
               <td>
@@ -107,6 +124,53 @@ window.history.replaceState("object or string", "{{ package_id }}", "/manage_a_p
               </td>
             </tr>
             <tr>
+              <td>
+                {% trans %}Domogik releases compliance{% endtrans %}
+              </td>
+              <td>
+                <div>
+                  {% set compliant = 0 %}
+                  {% for dmg_release in domogik_releases %}
+                    {% if dmg_release == release.domogik_min_release %}
+                      {% set compliant = 1 %}
+                    {% endif %}
+                    <span class="tag label label-{% if compliant == 1 %}success{% else %}default{% endif %}">{{ dmg_release }}</span>
+                    {% if dmg_release == release.domogik_max_release %}
+                      {% set compliant = 0 %}
+                    {% endif %}
+                  {% endfor %}
+                </div>
+                <div>
+                  {% trans %}Min : {% endtrans %} {{ release.domogik_min_release }}
+                </div>
+                <form  method="post" action="{{ url_for("set_domogik_max_release") }}" class="form-inline">
+                  {% trans %}Max : {% endtrans %}
+                  <input type="hidden" name="package" value="{{ package_id }}">
+                  <input type="hidden" name="type" value="{{ type }}">
+                  <input type="hidden" name="name" value="{{ name }}">
+                  <input type="hidden" name="release" value="{{ release.release }}">
+                  <div class="form-group ">
+                    <div class="input-group">
+                      <select class="form-control" id="max_release" name="max_release"> 
+                        <option>{{ release.domogik_max_release }}</option>
+                        <option>--</option>
+                        {% for rel in domogik_releases %}
+                          <option>{{ rel }}</option>
+                        {% endfor %}
+                      </select>
+                      <span class="input-group-btn">
+                        <input id="submit_new_status" type="submit" value="{% trans %}Change{% endtrans %}" class="btn btn-default">
+                      </span>
+                      <span class="input-group-btn">
+                        <a href="{{ url_for("help_domogik_max_release") }}" class="btn btn-default">{% trans %}Help{% endtrans %}</a>
+                      </span>
+                      <span class="input-group-btn">
+                    </div>
+                  </div>
+                </form>
+              </td>
+            </tr>
+            <tr>
               <td>{% trans %}Package url{% endtrans %}</td>
               <td><a href="{{ release.url_package }}">{{ release.url_package }}</a></td>
             </tr>
@@ -115,11 +179,27 @@ window.history.replaceState("object or string", "{{ package_id }}", "/manage_a_p
               <td>
                 <p><a href="{{ release.url_documentation }}">{{ release.url_documentation }}</a></p>
                 <p id="doc-{{ release.release | replace(".", "-") }}"></p>
+                <p><a class="btn btn-default" href="{{ url_for("help_documentation") }}">{% trans %}Help{% endtrans %}</a></p>
               </td>
             </tr>
             <tr>
               <td>{% trans %}Package tests{% endtrans %}</td>
-              <td><img src="{{ release.url_tests }}"></td>
+              <td>
+                {% if release.url_tests_img != None %}
+                  <p>
+                    {% trans %}Release build : {% endtrans %}<img src="{{ release.url_tests_img }}">
+                  </p>
+                {% endif %}
+                {% if release.url_tests != None %}
+                  <p>
+                    <a href="{{ release.url_tests }}">{% trans %}Build details{% endtrans %}</a>
+                  </p>
+                {% else %}
+                  <div class="alert alert-danger">
+                    {% trans %}Warning : no automated tests defined for this package!{% endtrans %}
+                  </div>
+                {% endif %}
+              </td>
             </tr>
             <tr>
               <td>{% trans %}Submitted on {% endtrans %}</td>
@@ -198,10 +278,12 @@ window.history.replaceState("object or string", "{{ package_id }}", "/manage_a_p
             <td>{% trans %}Website{% endtrans %}</td>
             <td><a href="{{ informations.site }}">{{ informations.site }}</a></td>
           </tr>
+<!-- TO ACTIVATE LATER
           <tr>
             <td>{% trans %}New plugin ?{% endtrans %}</td>
             <td>{{ informations.is_new }}</td>
           </tr>
+-->
         </table>
       </div>
 

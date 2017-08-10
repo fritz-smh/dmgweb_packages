@@ -23,6 +23,9 @@ class Config:
             return None
     
     
+    def get_domogik_releases(self):
+        return self._get_config_item('domogik_releases')
+    
     def get_server_ip(self):
         return self._get_config_item('server_ip')
     
