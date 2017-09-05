@@ -304,6 +304,9 @@ window.history.replaceState("object or string", "{{ package_id }}", "/manage_a_p
         <div class="panel-heading">
           <h3 class="panel-title">{% trans %}Opened pull requests{% endtrans %}</h3>
         </div>
+        {% if pull_requests|length == 0 %}
+          <div class="panel-body">{% trans %}No pull request opened.{% endtrans %}</div>
+        {% endif %}
         <table class="table">
         {% for pull in pull_requests %}
           <tr><td>{{ pull | safe }}</td></tr>
@@ -322,6 +325,9 @@ window.history.replaceState("object or string", "{{ package_id }}", "/manage_a_p
             <a class='btn btn-danger' href='{{ new_issue_url}}'>{% trans %}Create a new issue{% endtrans %}</a>
           {% endif %}
         </div>
+        {% if pull_requests|length == 0 %}
+          <div class="panel-body">{% trans %}No issue opened.{% endtrans %}</div>
+        {% endif %}
         <table class="table">
         {% for issue in issues %}
           <tr><td>{{ issue | safe }}</td></tr>

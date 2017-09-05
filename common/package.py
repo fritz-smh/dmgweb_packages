@@ -255,7 +255,8 @@ class Packages():
     def get_packages(self):
         """ Return all packages
         """
-        return self.json
+        #return self.json
+        return sorted(self.json, key=itemgetter('type', 'name'), reverse = False)
 
        
     def get_packages_releases(self):
@@ -377,6 +378,10 @@ class Packages():
                                 'timestamp' : time.time()
                               }
                    pkg['releases'].append(pkg_data)
+
+                   # sort the releases by number desc
+                   pkg['releases'] =  sorted(pkg['releases'], key=itemgetter('release'), reverse = True)
+
                    self.add_note(pkg_type=pkg_type, 
                                  pkg_name=pkg_name, 
                                  content = u"<kbd>New release '{0}'</kbd>".format(pkg_release),

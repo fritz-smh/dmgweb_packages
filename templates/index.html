@@ -46,6 +46,10 @@
   padding: 0px;
 }
 
+.form-group {
+  margin-bottom: 0px;
+}
+
 /*** Tags ***/
 
 .tag {
@@ -60,6 +64,11 @@
 h3 {
   margin-top: 0px;
 }
+
+.with-margin {
+  margin-top: 1em;
+}
+
 
 /*** Ribbons ***/
 /* from http://www.cssportal.com/css-ribbon-generator/ */
@@ -162,12 +171,52 @@ h3 {
 <div class="container">
   <h1>Welcome on the <a href="http://www.domogik.org">Domogik</a> packages repository!</h1>
 
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <div class="input-group">
+        <div class="input-group-addon">{% trans %}Domogik release :{% endtrans %}</div>
+        <select class="form-control" id="domogik_release" name="domogik_release"> 
+          <option>{% trans %}Any{% endtrans %}</option>
+          {% for rel in domogik_releases %}
+            <option>{{ rel }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+  </div>
+  <script type="text/javascript">
+    $('#domogik_release').change(function() {
+      //alert($('#domogik_release').val());
+
+      // First, hide all
+      {% for dmg_release in domogik_releases %}
+        $('.rel-{{ dmg_release | replace(".", "-")}}').hide();
+      {% endfor %}
+      $('.rel-0-4-0').show();
+ 
+
+      // Then show the good ones
+      var release = $('#domogik_release').val().replace(".", "-");
+      $('.rel-'+release).show();
+      alert("show " + '.rel-'+release);
+    });
+  </script>
+
   <div class="flex-container">
     {% for pkg in packages %}
-    <button class="flex-item package" type="button" data-toggle="modal" data-target="#modal-{{ pkg.type }}-{{ pkg.name }}">
+    <button class="flex-item package 
+                   {% for release in pkg.releases %}
+                     {% for dmg_release in domogik_releases %}
+                       {% if dmg_release == release.domogik_min_release %}{% set compliant = 1 %}{% endif %}
+                       rel-{{ dmg_release | replace(".", "-") }}
+                       {% if dmg_release == release.domogik_max_release %}{% set compliant = 0 %}{% endif %}
+                     {% endfor %}
+                   {% endfor %}"
+            type="button" data-toggle="modal" data-target="#modal-{{ pkg.type }}-{{ pkg.name }}">
       <img src="{{ url_for("icons", type=pkg.type, name=pkg.name) }}">
       <div class="title text-center">{{ pkg.type }} {{ pkg.name }}</div>
     </button>
+
 
     <div class="modal fade" id="modal-{{ pkg.type }}-{{ pkg.name }}" tabindex="-1" role="dialog" aria-labelledby="modal-{{ pkg.type }}-{{ pkg.name }}">
       <div class="modal-dialog modal-lg" role="document">
@@ -177,67 +226,65 @@ h3 {
             <h2 class="modal-title" id="myModalLabel">{{ pkg.type }} {{ pkg.name }}</h2>
           </div>
           <div class="modal-body">
-            TODO : tri par release dec.
             {% for release in pkg.releases %}
               {# Filter on the release status #}
               {% if release.status in ['BETA', 'STABLE'] %}
                 <div class="package panel">
                   <div class="ribbon_{{ release.status | lower }}"><span>{{ release.status }}</span></div>
                   <div class="panel-body">
-                  <table class="table">
-                    <tr>
-                      <td>
-                        <img src="{{ url_for("icons", type=pkg.type, name=pkg.name, release=release.release ) }}" class="pull-left">
-                      </td>
-                      <td>
-                        <h3>{{ release.release }}</h3>
-                        <p>{{ release.description }}</p>
-                        <div>
-                          {% for tag in release.tags %}
-                            <span class="tag label label-default">{{ tag }}</span>
-                          {% endfor %}
+                    <table class="table">
+                      <tr>
+                        <td>
+                          <img src="{{ url_for("icons", type=pkg.type, name=pkg.name, release=release.release ) }}" class="pull-left">
+                        </td>
+                        <td>
+                          <h3>{{ release.release }}</h3>
+                          <p>{{ release.description }}</p>
+                          <div>
+                            {% for tag in release.tags %}
+                              <span class="tag label label-default">{{ tag }}</span>
+                            {% endfor %}
+                          </div>
+                        </td>
+                      </tr>
+                    </table>
+                    <div>
+                      <a class="btn btn-default" href="{{ release.url_documentation }}"><span class="glyphicon glyphicon-book" aria-hidden="true"></span> {% trans %}Documentation{% endtrans %}</a>
+                      <a class="btn btn-default" href="{{ pkg.site }}"><span class="glyphicon glyphicon-globe" aria-hidden="true"></span> {% trans %}Web site{% endtrans %}</a>
+                    </div>
+                    <div class="alert alert-info">
+                      <p>{% trans %}Installation : {% endtrans %}</p>
+                      <pre>dmg_package -i {{ release.url_package }}</pre>
+                    </div>
+                    <div>
+                      {% trans %}Domogik releases compliance : {% endtrans %}
+                      {% set compliant = 0 %}
+                      {% for dmg_release in domogik_releases %}
+                        {% if dmg_release == release.domogik_min_release %}
+                          {% set compliant = 1 %}
+                        {% endif %}
+                        <span class="tag label label-{% if compliant == 1 %}success{% else %}default{% endif %}">{{ dmg_release }}</span>
+                        {% if dmg_release == release.domogik_max_release %}
+                          {% set compliant = 0 %}
+                        {% endif %}
+                      {% endfor %}
+                    </div>
+                    <div class='with-margin'>
+                      {% trans %}Published on {% endtrans %} 
+                      <em>{{ release.timestamp | datetime }}</em> 
+                      {% trans %} by {% endtrans %}
+                      <em>{{ release.author }}</em>
+                      <form  method="post" action="{{ url_for("help_report_an_issue") }}" class="form pull-right">
+                        <input type="hidden" name="type" value="{{ pkg.type }}">
+                        <input type="hidden" name="name" value="{{ pkg.name }}">
+                        <input type="hidden" name="release" value="{{ release.release }}">
+                        <div class="form-group ">
+                          <div class="input-group">
+                            <button id="report_an_issue" type="submit" class="btn btn-default"><span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span> {% trans %}Report an issue{% endtrans %}</button>
+                          </div>
                         </div>
-                      </td>
-                    </tr>
-                  </table>
-                  <div>
-                    <a class="btn btn-default" href="{{ release.url_documentation }}"><span class="glyphicon glyphicon-book" aria-hidden="true"></span> {% trans %}Documentation{% endtrans %}</a>
-                    <a class="btn btn-default" href="{{ pkg.site }}"><span class="glyphicon glyphicon-globe" aria-hidden="true"></span> {% trans %}Web site{% endtrans %}</a>
-                  </div>
-                  <div class="alert alert-info">
-                    <p>{% trans %}Installation : {% endtrans %}</p>
-                    <pre>dmg_package -i {{ release.url_package }}</pre>
-                  </div>
-                  <div>
-                    {% trans %}Domogik releases compliance : {% endtrans %}
-                    {% set compliant = 0 %}
-                    {% for dmg_release in domogik_releases %}
-                      {% if dmg_release == release.domogik_min_release %}
-                        {% set compliant = 1 %}
-                      {% endif %}
-                      <span class="tag label label-{% if compliant == 1 %}success{% else %}default{% endif %}">{{ dmg_release }}</span>
-                      {% if dmg_release == release.domogik_max_release %}
-                        {% set compliant = 0 %}
-                      {% endif %}
-                    {% endfor %}
-                  </div>
-                  <div>
-                    {% trans %}Published on {% endtrans %} 
-                    <em>{{ release.timestamp | datetime }}</em> 
-                    {% trans %} by {% endtrans %}
-                    <em>{{ release.author }}</em>
-                    <form  method="post" action="{{ url_for("help_report_an_issue") }}" class="form pull-right">
-                      <input type="hidden" name="type" value="{{ pkg.type }}">
-                      <input type="hidden" name="name" value="{{ pkg.name }}">
-                      <input type="hidden" name="release" value="{{ release.release }}">
-                      <div class="form-group ">
-                        <div class="input-group">
-                          <button id="report_an_issue" type="submit" class="btn btn-default"><span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span> {% trans %}Report an issue{% endtrans %}</button>
-                        </div>
-                      </div>
-                    </form>
-
-                  </div>
+                      </form>
+                    </div>
                   </div>
                 </div>
               {% endif %}
