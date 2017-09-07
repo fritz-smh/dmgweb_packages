@@ -84,6 +84,7 @@ Bootstrap(app)
 ###### Configuration part
 
 app.my_config = Config()
+app.next_url = "/"  # used by github login
 app.GITHUB_AUTH_SKIPPING = GITHUB_AUTH_SKIPPING
 
 

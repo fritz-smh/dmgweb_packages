@@ -13,7 +13,7 @@ def token_getter():
 @app.route('/github-callback')
 @github.authorized_handler
 def authorized(access_token):
-    next_url = request.args.get('next') or url_for('index')
+    next_url = app.next_url
     if access_token is None:
         return redirect(next_url)
 
@@ -33,6 +33,8 @@ def authorized(access_token):
 
 @app.route('/login')
 def login():
+    next_url = request.args.get('next') or url_for('index')
+    app.next_url = next_url
     if app.GITHUB_AUTH_SKIPPING == True:
         app.logger.warning("Development mode : AUTHENTICATION SKIPPED (see config.json => github>skip")
         # we skip the authentication : 'dev mode'
