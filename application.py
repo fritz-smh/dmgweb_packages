@@ -108,9 +108,9 @@ def login_required(f):
     def decorated_function(*args, **kwargs):
         app.logger.debug("Login required for this url. g.user = {0}".format(g.user))
         # TODO: reactivate
-        #if g.user is None:
-        #    app.logger.debug("Redirect to the login url")
-        #    return redirect(url_for('login', next=request.url))
+        if g.user is None:
+            app.logger.debug("Redirect to the login url")
+            return redirect(url_for('login', next=request.url))
         return f(*args, **kwargs)
     return decorated_function
 
@@ -139,7 +139,7 @@ def before_request():
         app.logger.info("--- Before request | username = {0}".format(g.username))
         # is the user member of the Domogik organisation ?
         # True or False
-        g.core_team = is_core_team_member(github, g.username)
+        g.core_team = is_core_team_member(app.logger, g.username)
 
 
 @app.after_request

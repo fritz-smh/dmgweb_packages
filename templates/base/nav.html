@@ -17,29 +17,21 @@
         <li>
           <a href="{{ url_for("manage_packages") }}"><span class='glyphicon glyphicon-plus' aria-hidden='true'></span> {% trans %}Manage the packages{% endtrans %}</a>
         </li>
-        {% if g.core_team %}
-        <li>
-          <a href="#"><span class='glyphicon glyphicon-user' aria-hidden='true'></span> Core team</a>
-        </li>
-        {% endif %}
       </ul>
       <ul class="nav navbar-nav navbar-right">
-          {% if g.username %}
+        {% if g.user %}
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class='glyphicon glyphicon-user' aria-hidden='true'></span> {{ g.username }} <span class="caret"></span></a> 
+            <ul class="dropdown-menu">
+              <li>
+                <a href="{{ url_for("logout") }}"><span class='glyphicon glyphicon-log-out' aria-hidden='true'></span> {% trans %}Logout{% endtrans %}</a>    
+              </li>
+          </li>
+        {% elif not g.build %}
           <li>
-              <a href="{{ url_for("user") }}">{{ g.username }}
-              {% if g.core_team %}
-                *
-              {% endif %}
-              </a>
+            <a href="{{ url_for("login") }}"><span class='glyphicon glyphicon-log-in' aria-hidden='true'></span> {% trans %}Login (Github){% endtrans %}</a>    
           </li>
         {% endif %}
-        <li>
-          {% if g.user %}
-            <a href="{{ url_for("logout") }}">Logout</a> 
-          {% elif not g.build %}
-            <a href="{{ url_for("login") }}">Login (github Oauth)</a>    
-          {% endif %}
-        </li>
       </ul>
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->

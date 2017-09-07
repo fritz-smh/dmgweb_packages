@@ -202,6 +202,9 @@ h3 {
     });
   </script>
 
+  {% if packages|length == 0 %}
+    <div class="alert alert-info" role="alert">{% trans %}There is no package published yet{% endtrans %}</div>
+  {% endif %}
   <div class="flex-container">
     {% for pkg in packages %}
     <button class="flex-item package 

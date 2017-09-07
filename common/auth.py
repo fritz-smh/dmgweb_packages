@@ -16,21 +16,23 @@ def get_github_oauth_data():
                tmp_json['github']['client_secret'], \
                tmp_json['github']['callback_url']
     else:
-       app.logger.error(u"Github oauth configuration : unable to open or read file '{0}')".format(CONFIG_FILE))
+       #app.logger.error(u"Github oauth configuration : unable to open or read file '{0}')".format(CONFIG_FILE))
        raise Exception(u"Github oauth configuration : unable to open or read file '{0}')".format(CONFIG_FILE))
     pass
 
 
 
 # TODO : grab information from config file
-def is_core_team_member(username):
-    app.logger.debug(u"Check if user '{0}' in core team".format(username))
-    app.logger.debug(u"Hardcoded Core team members are : {0}".format(core_team_members))
+def is_core_team_member(log, username):
+    log.debug(u"Check if user '{0}' in core team".format(username))
+    log.debug(u"Hardcoded Core team members are : {0}".format(HARDCODED_CORE_TEAM_MEMBERS))
 
     # handle hardcoded members
     if username in HARDCODED_CORE_TEAM_MEMBERS:
-        app.logger.debug(u"This is a core team member :)")
+        log.debug(u"This is a core team member :)")
         return True
-    app.logger.debug(u"This is a core team member :)")
+
+    # TODO : read config file
+    log.debug(u"This is a core team member :)")
     return False
 

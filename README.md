@@ -26,9 +26,11 @@ Install some prerequisites on the server:
     pip install Flask-SQLAlchemy
     pip install Flask-Bootstrap
     pip install Flask-WTF
+    pip install Flask-Babel
     pip install Frozen-Flask
     pip install magic
     pip install python-twitter
+    pip install uwsgi
 
 
 On the server, clone the repository: 
@@ -47,41 +49,29 @@ Create a configuration file:
 
 Then, fill the configuration file **config.json** 
 
-
     {
       "server_ip" : "0.0.0.0",
       "server_port" : "80",
-      "github" : 
+      "github" :
         {
-          "client_id" : "c5a32b7a5e965432febd",
-          "client_secret" : "c543f3423a32cC435454353450674a076dd12ca7",
-          "callback_url" : "http://my-repo.com/github-callback"
+          "client_id" : "xxxx",
+          "client_secret" : "xxxx",
+          "callback_url" : "http://something.com/github-callback"
         },
       "twitter" :
-        { 
-          "enable" : true,
-          "consumer_key" : "bcdsjbdsjbfdsbfjbdjfbdsjbfjb",
-          "consumer_secret" : "FDSFDSfdsfdsfsdfDSFSDFDSFDSfdsfdsFDSFSDFDSfsdfdsfsd",
-          "access_token" :  "324234234FDSFDR43RF34GF45TGF43FG54YTGTFG34TG45T3TG",
-          "access_token_secret" : "FDSF234R32RFreefg3R34Fdfefefreferff43432FFRFe"
-        },
-
-      "root_repository" : "http://repo-dev.domogik.org/",
-      "categories" : 
-        [
-          { "id" : "development",    "name" : "Development",  "is_development" : true,  "is_obsolete" : false },
-          { "id" : "stable",     "name" : "Stable",   "is_development" : false, "is_obsolete" : false },
-          { "id" : "oldstable",  "name" : "Obsolete", "is_development" : false, "is_obsolete" : true }
-        ],
-      "dashboard" :
         {
-          "components" : 
-            [
-              { "label" : "Domogik (master)",     "url_build_status" : "https://travis-ci.org/domogik/domogik.png?branch=master" },
-              { "label" : "Domogik (0.3)",        "url_build_status" : "https://travis-ci.org/domogik/domogik.png?branch=0.3" }
-            ]
-        }
+          "enable" : true,
+          "consumer_key" : "xxxx",
+          "consumer_secret" : "xxxx",
+          "access_token" :  "xxxx-Qczs1xAuXZlomypi2D6eRBaS2XTCGeRryeNK3b4",
+          "access_token_secret" : "xxxx"
+        },
+      "root_repository" : "http://xxxx/",
+      "domogik_releases" : [
+        "0.4.0", "0.4.1", "0.4.2", "0.5.0", "0.5.1", "0.5.2", "0.6.0"
+      ]
     }
+
 
 The following example assume the current user ($LOGNAME) is the user which will run the tool.
 

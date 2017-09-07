@@ -277,6 +277,7 @@ class Packages():
     def save(self):
         """ Save the packages list
         """
+        self.logger.debug(self.json)
         try:
             my_file = open(PACKAGES, "w")
             my_file.write(json.dumps(self.json, sort_keys=True, indent=4))

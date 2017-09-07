@@ -173,7 +173,7 @@ def submit_new_package():
                              pkg_name = pkg_name,
                              pkg_email = pkg_email,
                              pkg_site = pkg_site,
-                             user = g.user)
+                             user = g.username)
         except PackageError as e:
             app.logger.error(u"Error while creating the package. Error is : {0}".format(e.value))
             return render_template('submit_new_package_error.html',
@@ -352,7 +352,7 @@ def submit_new_package_release_async():
                                  pkg_tags, 
                                  pkg_description, 
                                  pkg_domogik_min_release, 
-                                 g.user)
+                                 g.username)
     except PackageError as e:
         msg = u"Error while adding the package. Error is : {0}".format(e.value)
         app.logger.error(msg)
@@ -378,7 +378,7 @@ def add_note():
         app.packages.add_note(request.form['type'], 
                               request.form['name'], 
                               request.form['content'],
-                              g.user) 
+                              g.username) 
         return request.form['content']
     except:
         msg = u"Error while adding a note. Error is : {0}".format(traceback.format_exc())
@@ -399,7 +399,7 @@ def set_status():
                                 request.form['name'], 
                                 request.form['release'], 
                                 request.form['new_status'],
-                                g.user) 
+                                g.username) 
         #return request.form['new_status']
         return redirect(url_for("manage_a_package", package="{0}-{1}".format(request.form['type'], request.form['name'])))
     except:
@@ -421,7 +421,7 @@ def set_domogik_max_release():
                                 request.form['name'], 
                                 request.form['release'], 
                                 request.form['max_release'],
-                                g.user) 
+                                g.username) 
         #return request.form['new_status']
         return redirect(url_for("manage_a_package", package="{0}-{1}".format(request.form['type'], request.form['name'])))
     except:
@@ -489,4 +489,4 @@ def check_url():
             return '<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> (HTTP code = {0})'.format(response.getcode())
     except:
         app.logger.warning(u"Error while calling url '{0}'. Error is : {1}".format(url, traceback.format_exc()))
-        return '<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> ERROR while checking url'
+        return '<div class="alert alert-danger" role="alert"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> ERROR while checking url</div>'

@@ -43,6 +43,10 @@ body {
 	border-bottom: 5px solid #005774;
 }
 
+.navbar-dmg .navbar-text {
+	color: #eee;
+}
+
 .navbar-dmg a {
 	color: #eee;
 }
