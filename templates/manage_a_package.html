@@ -65,7 +65,7 @@ window.history.replaceState("object or string", "{{ package_id }}", "/manage_a_p
           <table class="table">
             <tr>
               <td>
-                <img src="{{ url_for("icons", type=type, name=name, release=release.release) }}" class="pull-left"> 
+                <img src="{{ url_for("icon_for_release", type=type, name=name, release=release.release) }}" class="pull-left"> 
               </td>
               <td>
                 <p>{{ release.description }}</p>

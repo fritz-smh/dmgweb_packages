@@ -198,11 +198,11 @@ h3 {
       var release = $('#domogik_release').val().replace(/\./g, "-");
       if (release == "{% trans %}Any{% endtrans %}") {
           $('.rel-any').show();
-          alert("show {% trans %}Any{% endtrans %}");
+          //alert("show {% trans %}Any{% endtrans %}");
       }
       else {
           $('.rel-'+release).show();
-          alert("show " + '.rel-'+release);
+          //alert("show " + '.rel-'+release);
       }
     });
     $('#status').change(function() {
@@ -213,11 +213,11 @@ h3 {
       var status = $('#status').val();
       if (status == "{% trans %}Any{% endtrans %}") {
           $('.status-any').show();
-          alert("show {% trans %}Any{% endtrans %}");
+          //alert("show {% trans %}Any{% endtrans %}");
       }
       else {
           $('.status-'+status).show();
-          alert("show " + '.status-'+status);
+          //alert("show " + '.status-'+status);
       }
     });
   </script>
@@ -254,7 +254,7 @@ h3 {
                        {% endif %}
                      {% endfor %}"
               type="button" data-toggle="modal" data-target="#modal-{{ pkg.type }}-{{ pkg.name }}">
-              <img src="{{ url_for("icons", type=pkg.type, name=pkg.name) }}">
+              <img src="{{ url_for("icon", type=pkg.type, name=pkg.name) }}">
               <div class="title text-center">{{ pkg.type }} {{ pkg.name }}</div>
               <div>
                 {% for release in pkg.releases %}
@@ -303,7 +303,7 @@ h3 {
                         <table class="table">
                           <tr>
                             <td>
-                              <img src="{{ url_for("icons", type=pkg.type, name=pkg.name, release=release.release ) }}" class="pull-left">
+                              <img src="{{ url_for("icon_for_release", type=pkg.type, name=pkg.name, release=release.release ) }}" class="pull-left">
                             </td>
                             <td>
                               <h3>{{ release.release }}</h3>
