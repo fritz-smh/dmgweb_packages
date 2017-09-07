@@ -26,15 +26,25 @@ def authorized(access_token):
 
     session['user_id'] = user.id
     app.logger.info("Login....")
-    return redirect(url_for('index'))
+    #return redirect(url_for('index'))
+    app.logger.info("Login : redirect to '{0}'".format(next_url))
+    return redirect(next_url)
 
 
 @app.route('/login')
 def login():
-    if session.get('user_id', None) is None:
-        return github.authorize()
+    if app.GITHUB_AUTH_SKIPPING == True:
+        app.logger.warning("Development mode : AUTHENTICATION SKIPPED (see config.json => github>skip")
+        # we skip the authentication : 'dev mode'
+        return redirect(url_for('index'))
     else:
-        return 'Already logged in'
+        # we DO the authentication
+        if session.get('user_id', None) is None:
+            return github.authorize()
+        else:
+            return 'Already logged in'
+
+
 
 
 @app.route('/logout')

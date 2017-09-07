@@ -54,6 +54,7 @@ Then, fill the configuration file **config.json**
       "server_port" : "80",
       "github" :
         {
+          "skip" : false,
           "client_id" : "xxxx",
           "client_secret" : "xxxx",
           "callback_url" : "http://something.com/github-callback"
@@ -72,6 +73,7 @@ Then, fill the configuration file **config.json**
       ]
     }
 
+The **skip** part in the **github** part allow to skip the Github authentication for development purpose. It should be set to false in production!!!!
 
 The following example assume the current user ($LOGNAME) is the user which will run the tool.
 

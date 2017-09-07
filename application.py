@@ -55,7 +55,7 @@ SECRET_KEY = 'development key'
 DEBUG = True
 
 # Set these values
-GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_CALLBACK_URL = get_github_oauth_data()
+GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_CALLBACK_URL, GITHUB_AUTH_SKIPPING = get_github_oauth_data()
 
 # setup flask
 app = Flask(__name__)
@@ -84,6 +84,7 @@ Bootstrap(app)
 ###### Configuration part
 
 app.my_config = Config()
+app.GITHUB_AUTH_SKIPPING = GITHUB_AUTH_SKIPPING
 
 
 ###### Database part
@@ -107,10 +108,15 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         app.logger.debug("Login required for this url. g.user = {0}".format(g.user))
-        # TODO: reactivate
-        if g.user is None:
-            app.logger.debug("Redirect to the login url")
-            return redirect(url_for('login', next=request.url))
+        if GITHUB_AUTH_SKIPPING == True:
+            app.logger.warning("Development mode : AUTHENTICATION SKIPPED (see config.json => github>skip")
+            # we skip the authentication : 'dev mode'
+            pass
+        else:
+            # we DO the authentication
+            if g.user is None:
+                app.logger.debug("Redirect to the login url")
+                return redirect(url_for('login', next=request.url))
         return f(*args, **kwargs)
     return decorated_function
 
@@ -132,14 +138,20 @@ def before_request():
     g.user = None
     g.username = None
     g.build = None
-    if 'user_id' in session:
-        # get user informations
-        g.user = User.query.get(session['user_id'])
-        g.username = github.get('user')['login']
-        app.logger.info("--- Before request | username = {0}".format(g.username))
-        # is the user member of the Domogik organisation ?
-        # True or False
-        g.core_team = is_core_team_member(app.logger, g.username)
+    if GITHUB_AUTH_SKIPPING == True:
+        # we skip the authentication : 'dev mode'
+        g.username = "@developper"
+
+    else:
+        # we DO the authentication
+        if 'user_id' in session:
+            # get user informations
+            g.user = User.query.get(session['user_id'])
+            g.username = github.get('user')['login']
+            app.logger.info("--- Before request | username = {0}".format(g.username))
+            # is the user member of the Domogik organisation ?
+            # True or False
+            g.core_team = is_core_team_member(app.logger, g.username)
 
 
 @app.after_request
