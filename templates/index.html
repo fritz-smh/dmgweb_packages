@@ -180,25 +180,44 @@ h3 {
             <option>{{ rel }}</option>
           {% endfor %}
         </select>
+        <div class="input-group-addon">{% trans %}Status :{% endtrans %}</div>
+        <select class="form-control" id="status" name="status"> 
+          <option>{% trans %}Any{% endtrans %}</option>
+          <option value="STABLE">{% trans %}Stable{% endtrans %}</option>
+          <option value="BETA">{% trans %}Beta{% endtrans %}</option>
+        </select>
       </div>
     </div>
   </div>
   <script type="text/javascript">
     $('#domogik_release').change(function() {
-
       // First, hide all
-      $('.package-all').hide();
- 
+      $('.rel-any').hide();
 
       // Then show the good ones
       var release = $('#domogik_release').val().replace(/\./g, "-");
       if (release == "{% trans %}Any{% endtrans %}") {
-          $('.package-all').show();
+          $('.rel-any').show();
           alert("show {% trans %}Any{% endtrans %}");
       }
       else {
           $('.rel-'+release).show();
           alert("show " + '.rel-'+release);
+      }
+    });
+    $('#status').change(function() {
+      // First, hide all
+      $('.status-any').hide();
+
+      // Then show the good ones
+      var status = $('#status').val();
+      if (status == "{% trans %}Any{% endtrans %}") {
+          $('.status-any').show();
+          alert("show {% trans %}Any{% endtrans %}");
+      }
+      else {
+          $('.status-'+status).show();
+          alert("show " + '.status-'+status);
       }
     });
   </script>
@@ -219,8 +238,8 @@ h3 {
          {% endif %}
       {% endfor %}
       {% if display['value'] %}
-            <button class="flex-item package package-all
-                     {% for release in pkg.releases %}
+            <button class="flex-item package rel-any status-any 
+                     {% for release in pkg.releases %}  status-{{ release.status }}
                        {% if release.status in ['BETA', 'STABLE'] %}
                          {% set compliant = {'value': False} %}
                          {% for dmg_release in domogik_releases %}
@@ -241,7 +260,7 @@ h3 {
                 {% for release in pkg.releases %}
                   {# Filter on the release status #}
                   {% if release.status in ['BETA', 'STABLE'] %}
-                    <span class="label label-success package-all
+                    <span class="label label-success rel-any status-any status-{{release.status}}
                               {% set compliant = {'value': False} %}
                               {% for dmg_release in domogik_releases %}
                                 {% if dmg_release == release.domogik_min_release %}
@@ -268,7 +287,7 @@ h3 {
                 {% for release in pkg.releases %}
                   {# Filter on the release status #}
                   {% if release.status in ['BETA', 'STABLE'] %}
-                    <div class="package panel  package-all
+                    <div class="package panel  rel-any status-any status-{{ release.status }}
                               {% set compliant = {'value': False} %}
                               {% for dmg_release in domogik_releases %}
                                 {% if dmg_release == release.domogik_min_release %}
