@@ -6,7 +6,7 @@ from flask_wtf import Form
 from wtforms import TextField, HiddenField, SelectField
 from wtforms.validators import DataRequired
 
-from dmgweb_packages.application import app, github, login_required
+from dmgweb_packages.application import app, github, login_required, core_team_required
 from dmgweb_packages.common.package import PackageChecker, PackageError
 import json
 import os
@@ -388,6 +388,7 @@ def add_note():
 
 @app.route('/set_status', methods=['POST'])
 @login_required
+@core_team_required
 def set_status():
     """ To be called as an ajax call. Quick way to change a status.
     """
@@ -410,6 +411,7 @@ def set_status():
 
 @app.route('/set_domogik_max_release', methods=['POST'])
 @login_required
+@core_team_required
 def set_domogik_max_release():
     """ To be called as an ajax call. Quick way to change a domogik max release for a package release
     """
@@ -432,6 +434,7 @@ def set_domogik_max_release():
 
 @app.route('/change_status', methods=['POST'])
 @login_required
+@core_team_required
 def change_status():
     """ To be displayed before setting a new status. List the things to check before being ok
     """

@@ -79,48 +79,32 @@ window.history.replaceState("object or string", "{{ package_id }}", "/manage_a_p
             <tr>
               <td>{% trans %}Status{% endtrans %}</td>
               <td>
-                <form  method="post" action="{{ url_for("change_status") }}" class="form-inline">
-                  <input type="hidden" name="package" value="{{ package_id }}">
-                  <input type="hidden" name="type" value="{{ type }}">
-                  <input type="hidden" name="name" value="{{ name }}">
-                  <input type="hidden" name="release" value="{{ release.release }}">
-                  <div class="form-group ">
-                    <div class="input-group">
-                      <select class="form-control" id="new_status" name="new_status"> 
-                        <option>{{ release.status }}</option>
-                        <option>--</option>
-                        {% for a_status in release.next_status %}
-                          <option>{{ a_status }}</option>
-                        {% endfor %}
-                      </select>
-                      <span class="input-group-btn">
-                        <input id="submit_new_status" type="submit" value="{% trans %}Change{% endtrans %}" class="btn btn-default">
-                      </span>
-                      <span id="waiting-status" class='max-height: 20px'></span>
+                {% if g.core_team %}
+                  <form  method="post" action="{{ url_for("change_status") }}" class="form-inline">
+                    <input type="hidden" name="package" value="{{ package_id }}">
+                    <input type="hidden" name="type" value="{{ type }}">
+                    <input type="hidden" name="name" value="{{ name }}">
+                    <input type="hidden" name="release" value="{{ release.release }}">
+                    <div class="form-group ">
+                      <div class="input-group">
+                        <select class="form-control" id="new_status" name="new_status"> 
+                          <option>{{ release.status }}</option>
+                          <option>--</option>
+                          {% for a_status in release.next_status %}
+                            <option>{{ a_status }}</option>
+                          {% endfor %}
+                        </select>
+                        <span class="input-group-btn">
+                          <input id="submit_new_status" type="submit" value="{% trans %}Change{% endtrans %}" class="btn btn-default">
+                        </span>
+                        <span id="waiting-status" class='max-height: 20px'></span>
+                      </div>
                     </div>
-                  </div>
-                </form>
-                <script type="text/javascript">
-                  /*********
-                  $('#submit_new_status').click(function() {
-                    $('#waiting-status').html("<img src='/static/images/loader_bars.svg' class='responsive'>");
-                    $.post( "{{ url_for('set_status') }}", { type: "{{ type }}",
-                                                             name: "{{ name }}", 
-                                                             release: "{{ release.release }}", 
-                                                             new_status: $('#new_status').val() })
-                    .done(function( data ) {
-                      $('#waiting-status').html("");
-                      var note_text = "Version <kbd>{{ release.release }}</kbd> status set to <kbd>" + data + "</kbd>";
-                      var new_note = $("<hr><p>" + note_text + "</p><p class='text-right'><em>me</em></p>");
-                      $(new_note).prependTo($('#notes'))
-                    })
-                    .fail(function( xhr, textStatus, errorThrown ) {
-                    })
-                    .always(function() {
-                    });
-                  });
-                  ******/
-                </script>
+                  </form>
+                {% else %}
+                  <span class="glyphicon glyphicon-lock" aria-hidden="true"></span> {{ release.status }}
+                  <a href="{{ url_for("help_lock") }}" class="btn btn-default">{% trans %}Help{% endtrans %}</a>
+                {% endif %}
               </td>
             </tr>
             <tr>
@@ -143,31 +127,36 @@ window.history.replaceState("object or string", "{{ package_id }}", "/manage_a_p
                 <div>
                   {% trans %}Min : {% endtrans %} {{ release.domogik_min_release }}
                 </div>
-                <form  method="post" action="{{ url_for("set_domogik_max_release") }}" class="form-inline">
-                  {% trans %}Max : {% endtrans %}
-                  <input type="hidden" name="package" value="{{ package_id }}">
-                  <input type="hidden" name="type" value="{{ type }}">
-                  <input type="hidden" name="name" value="{{ name }}">
-                  <input type="hidden" name="release" value="{{ release.release }}">
-                  <div class="form-group ">
-                    <div class="input-group">
-                      <select class="form-control" id="max_release" name="max_release"> 
-                        <option>{{ release.domogik_max_release }}</option>
-                        <option>--</option>
-                        {% for rel in domogik_releases %}
-                          <option>{{ rel }}</option>
-                        {% endfor %}
-                      </select>
-                      <span class="input-group-btn">
-                        <input id="submit_new_status" type="submit" value="{% trans %}Change{% endtrans %}" class="btn btn-default">
-                      </span>
-                      <span class="input-group-btn">
-                        <a href="{{ url_for("help_domogik_max_release") }}" class="btn btn-default">{% trans %}Help{% endtrans %}</a>
-                      </span>
-                      <span class="input-group-btn">
+                {% if g.core_team %}
+                  <form  method="post" action="{{ url_for("set_domogik_max_release") }}" class="form-inline">
+                    {% trans %}Max : {% endtrans %}
+                    <input type="hidden" name="package" value="{{ package_id }}">
+                    <input type="hidden" name="type" value="{{ type }}">
+                    <input type="hidden" name="name" value="{{ name }}">
+                    <input type="hidden" name="release" value="{{ release.release }}">
+                    <div class="form-group ">
+                      <div class="input-group">
+                        <select class="form-control" id="max_release" name="max_release"> 
+                          <option>{{ release.domogik_max_release }}</option>
+                          <option>--</option>
+                          {% for rel in domogik_releases %}
+                            <option>{{ rel }}</option>
+                          {% endfor %}
+                        </select>
+                        <span class="input-group-btn">
+                          <input id="submit_new_status" type="submit" value="{% trans %}Change{% endtrans %}" class="btn btn-default">
+                        </span>
+                        <span class="input-group-btn">
+                          <a href="{{ url_for("help_domogik_max_release") }}" class="btn btn-default">{% trans %}Help{% endtrans %}</a>
+                        </span>
+                        <span class="input-group-btn">
+                      </div>
                     </div>
-                  </div>
-                </form>
+                  </form>
+                {% else %}
+                  <span class="glyphicon glyphicon-lock" aria-hidden="true"></span> {% trans %}Max : {% endtrans %}{{ release.domogik_max_release }}
+                  <a href="{{ url_for("help_lock") }}" class="btn btn-default">{% trans %}Help{% endtrans %}</a>
+                {% endif %}
               </td>
             </tr>
             <tr>

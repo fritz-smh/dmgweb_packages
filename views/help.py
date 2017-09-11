@@ -63,3 +63,13 @@ def help_report_an_issue():
                             release = pkg_release,
                             new_issue_url = pkg_new_issue_url)
 
+
+@app.route('/help_lock', methods=['GET'])
+@login_required
+def help_lock():
+    app.logger.debug(u"Calling /help_lock")
+    app.logger.debug(u"Method='{0}', form='{1}'".format(request.method, request.form))
+
+    return render_template('help_lock.html')
+
+
