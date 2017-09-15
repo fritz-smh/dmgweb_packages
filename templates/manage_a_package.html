@@ -7,12 +7,23 @@
 .tag {
   display: inline-block;
 }
+
+#show-statistics {
+  margin-bottom: 1em;
+}
+
+#statistics {
+  display: none;
+}
 </style>
 
 <script type="text/javascript">
 // to allow the user to reload by revalidating url in address bar
 window.history.replaceState("object or string", "{{ package_id }}", "/manage_a_package?package={{ package_id }}");
 </script>
+
+
+
 
 <div class="container">
   <h1>{% trans %}Package{% endtrans %} {{ package_id }}</h1>
@@ -34,27 +45,34 @@ window.history.replaceState("object or string", "{{ package_id }}", "/manage_a_p
     </form>
   </div>
 
-<!--
-  <div id="svg">
+  <a href="#" id="show-statistics" class="btn btn-default">{% trans %}Show statistics{% endtrans %}</a>
+  <div class="row" id="statistics">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <a href="#" id="hide-statistics" class="pull-right">{% trans %}Hide statistics{% endtrans %}</a>
+        <h3 class="panel-title">{% trans %}Package usage statistics{% endtrans %}</h3>
+      </div>
+      <div class="panel-body">
+        <div class="col-md-3">
+          <img class="img-responsive" src="/metrics/current_package_releases_{{ type }}_{{ name }}.png">
+        </div>
+        <div class="col-md-9">
+          <img class="img-responsive" src="/metrics/weekly_package_usage_{{ type }}_{{ name }}.png">
+        </div>
+      </div>
+    </div>
   </div>
-  <script type="text/javascript" src="/static/js/jquery.svg.min.js"></script> 
   <script type="text/javascript">
-    $(document).ready(function() {
-      $("#svg").svg({
-        onLoad: function() {
-          var svg = $("#svg").svg('get');
-          svg.load('/static/worfklows/workflow-release2.svg', {addTo: true,  changeSize: true});        
-          //var rect = $('#submitted');
-          //rect.style = "fill:#ff0000;";
-          //$('#svg').css({ fill: "#ff0000" });
-          $('#svg').attr("fill","#FF0000");   
-        },
-        settings: {}
-      });  
-
+    $('#hide-statistics').click(function() {
+        $('#statistics').hide();
+        $('#show-statistics').show();
+    });
+    $('#show-statistics').click(function() {
+        $('#statistics').show();
+        $('#show-statistics').hide();
     });
   </script>
--->
+
   <div class="row">
     <div class="col col-md-5">
       {% for release in releases %}
@@ -105,6 +123,13 @@ window.history.replaceState("object or string", "{{ package_id }}", "/manage_a_p
                   <span class="glyphicon glyphicon-lock" aria-hidden="true"></span> {{ release.status }}
                   <a href="{{ url_for("help_lock") }}" class="btn btn-default">{% trans %}Help{% endtrans %}</a>
                 {% endif %}
+              </td>
+            </tr>
+            <tr>
+              <td>{% trans %}Review{% endtrans %}</td>
+              <td>
+                <a href="/reviews/{{ type }}_{{ name }}_{{ release.release }}.html">{% trans %}Read the review{% endtrans %}</a>
+                <p id="review-{{ release.release | replace(".", "-") }}"></p>
               </td>
             </tr>
             <tr>
@@ -197,6 +222,7 @@ window.history.replaceState("object or string", "{{ package_id }}", "/manage_a_p
           </table>
         </div>
         <script type="text/javascript">
+          // Check the documentation URL /////////////////////
           $.post("{{ url_for("check_url") }}", { url : "{{ release.url_documentation }}" })
           .done(function( data ) {
             $('#doc-{{ release.release | replace(".", "-") }}').html(data);
@@ -204,6 +230,20 @@ window.history.replaceState("object or string", "{{ package_id }}", "/manage_a_p
           })
           .fail(function( xhr, textStatus, errorThrown ) {
             $('#doc-{{ release.release | replace(".", "-") }}').html("{% trans %}Error while checking doc url : {% endtrans %}" + xhr.responseText);
+          })
+          .always(function() {
+          });
+
+          // Check the review URL /////////////////////
+          var loc = window.location;
+          var baseUrl = loc.protocol + "//" + loc.hostname + (loc.port? ":"+loc.port : ""); 
+          $.post("{{ url_for("check_url") }}", { url : baseUrl + "/reviews/{{ type }}_{{ name }}_{{ release.release }}.html" })
+          .done(function( data ) {
+            $('#review-{{ release.release | replace(".", "-") }}').html(data);
+            console.log(data);
+          })
+          .fail(function( xhr, textStatus, errorThrown ) {
+            $('#review-{{ release.release | replace(".", "-") }}').html("{% trans %}Error while checking review url : {% endtrans %}" + xhr.responseText);
           })
           .always(function() {
           });

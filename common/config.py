@@ -38,4 +38,13 @@ class Config:
     def get_root_repository_url(self):
         return self._get_config_item('root_repository')
     
+    def get_metrics_url(self):
+        return self._get_config_item('metrics')['url']
+    
+    def get_metrics_token(self):
+        return self._get_config_item('metrics')['token']
+    
+    def get_review_command(self):
+        return self._get_config_item('review')['command']
+    
         

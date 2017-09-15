@@ -10,6 +10,7 @@ import time
 import shutil
 import hashlib
 import datetime
+import uuid
 ###from dmgweb_packages.common.tweet import tweet_message
 from operator import itemgetter
 from operator import attrgetter
@@ -53,6 +54,7 @@ USER_SERVICE = "@system@"
 
 ### Releases status
 STATUS = {
+           'SUBMITTED' : "Submitted",
            'AUTO_REVIEW_OK' : "Automatic review OK",
            'MANUAL_REVIEW_OK' : "Manuel review OK",
            'BETA' : "Beta",
@@ -95,6 +97,7 @@ class PackageChecker():
     def __init__(self, logger, url):
         self.url = url.strip()
         self.downloaded_file = None
+        self.unzipped_package_path = "/tmp/dmg_pkg_unzipped_{0}".format(str(uuid.uuid4()))
         self.json_data = None
         self.logger = logger
         self.logger.info(u"PackageChecker for {0}".format(url))
@@ -137,6 +140,30 @@ class PackageChecker():
             self.logger.warning(u"PackageChecker : download error for '{0}' : {1}".format(self.downloaded_file, traceback.format_exc()))
             return False, "Error while downloading the package : {0}".format(traceback.format_exc())
         return True, None
+
+
+    def get_package_path(self):
+        """
+        """
+        self.logger.info(u"PackageChecker : extract all the zip in '{0}' and return the target folder path....")
+        try:
+            with zipfile.ZipFile(self.downloaded_file, "r") as z:
+                z.extractall(self.unzipped_package_path)
+
+            # Note : the target folder will contain a first folder which is the package's one. Exampel :
+            # ls /tmp/dmg_pkg_unzipped_30ef60ef-90e4-4008-8eea-e6e73a4c7435
+            # domogik-plugin-weather-1.3
+
+            # So we add this folder to the returned path
+            additionnal_folder = os.listdir(self.unzipped_package_path)[0]
+            self.unzipped_package_path = os.path.join(self.unzipped_package_path, additionnal_folder)
+        except:
+            self.logger.error(u"PackageChecker : error while extracting the full Zip file. Error is : {0}".format(traceback.format_exc()))
+        self.logger.info(u"PackageChecker : extract all the zip finished")
+
+      
+
+        return self.unzipped_package_path
 
 
     def get_info_json(self):
@@ -243,13 +270,20 @@ class Packages():
             self.logger.debug(u"The packages file '{0}' does not exists : starting from an empty list".format(PACKAGES))
             self.json = []
 
-    def list(self):
+    def list(self, form = True):
         """ Return the list of packages (not the releases, the packages)
         """
-        pkg_list = []
-        for pkg in self.json:
-            pkg_list.append((pkg['package_id'], pkg['package_id']))
-        return sorted(pkg_list)
+        # format for a form (to be displayed in a dropdown list)
+        if form:
+            pkg_list = []
+            for pkg in self.json:
+                pkg_list.append((pkg['package_id'], pkg['package_id']))
+            return sorted(pkg_list)
+        else:
+            pkg_list = []
+            for pkg in self.json:
+                pkg_list.append({'type' : pkg['type'], 'name' : pkg['name']})
+            return pkg_list
     
 
     def get_packages(self):
@@ -277,11 +311,12 @@ class Packages():
     def save(self):
         """ Save the packages list
         """
-        self.logger.debug(self.json)
+        self.logger.info(u"Saving JSON...")
         try:
             my_file = open(PACKAGES, "w")
             my_file.write(json.dumps(self.json, sort_keys=True, indent=4))
             my_file.close()
+            self.logger.info(u"Saving JSON finished!")
         except:
             msg = u"Unable to save the packages : {0}".format(traceback.format_exc())
             self.logger.error(msg)
@@ -334,7 +369,7 @@ class Packages():
                 'url_documentation' : 'http://......',
                 'url_tests' : 'http://......',
                 'url_review' : '/reviews/plugin_weather_1.1.html',
-                'status' : 'AUTO_REVIEW_OK',    // values : .....
+                'status' : 'SUBMITTED',    // values : .....
                 'next_status' : NEXT_STATUS['AUTO_REVIEW_OK'],
                 'author' : ...,
                 'tags' : ...,

@@ -2,7 +2,7 @@ import json
 import os
 from dmgweb_packages.common.config import CONFIG_FILE
 
-HARDCODED_CORE_TEAM_MEMBERS = ['fritz-smh']
+HARDCODED_CORE_TEAM_MEMBERS = ['fritz-smh', 'cereal2nd', 'tikismoke', 'nico0084', 'vdomos', 'overload08']
 
 
 def get_github_oauth_data():

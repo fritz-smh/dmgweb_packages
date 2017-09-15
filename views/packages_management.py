@@ -18,6 +18,7 @@ import tempfile
 import magic
 import zipfile
 import time
+from subprocess import Popen, PIPE
 
 # python 2 and 3
 try:
@@ -27,7 +28,7 @@ except ImportError:
     from urllib import urlopen
     from urllib import urlretrieve
 
-
+PWD = os.path.dirname(os.path.realpath(__file__))
 
 
 
@@ -326,6 +327,7 @@ def submit_new_package_release_async():
 
     # Get needed informations from the json
     try:
+        pkg_path = pkg_checker.get_package_path()
         pkg_type = pkg_checker.get_json()["identity"]["type"]
         pkg_name = pkg_checker.get_json()["identity"]["name"]
         pkg_release = pkg_checker.get_json()["identity"]["version"]
@@ -342,7 +344,27 @@ def submit_new_package_release_async():
     # TODO : review
     # TODO : review
     # TODO : review
+    # Execute the review as a background task
+    try:
+        review_bin = os.path.join(PWD, "..", "start-review.sh")
+        cmd = "nohup {0} {1} {2} {3} {4} &".format(review_bin, pkg_type, pkg_name, pkg_release, pkg_path) 
+        app.logger.info(u"Execute review : {0}".format(cmd))
+        p = Popen(cmd, 
+                  stdout=PIPE,
+                  stderr=PIPE,
+                  shell = True)
+        res = p.communicate()
+        app.logger.info(u"Review launched in background!")
+    except:
+        msg = u"Error while executing the review. Error is : {0}".format(traceback.format_exc())
+        app.logger.error(msg)
+        return render_template('submit_new_package_release_async.html',
+                               url = url,
+                               error = msg)
 
+
+
+    # Register the release
     try:
         app.packages.add_release(pkg_type, 
                                  pkg_name, 
@@ -484,11 +506,14 @@ def check_url():
     app.logger.debug(u"Method='{0}', form='{1}'".format(request.method, request.form))
     try:
         url = request.form['url']
+        app.logger.debug(u"Url to check is : '{0}'".format(url))
         response = urlopen(url)
         app.logger.debug(u"HTTP response code for url '{0}' is '{1}'".format(url, response.getcode()))
         if response.getcode() == 200:
+            app.logger.debug(u"Url is OK (http 200)")
             return '<span class="glyphicon glyphicon-ok" aria-hidden="true"></span> (HTTP code = {0})'.format(response.getcode())
         else:
+            app.logger.warning(u"Url is not ok")
             return '<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> (HTTP code = {0})'.format(response.getcode())
     except:
         app.logger.warning(u"Error while calling url '{0}'. Error is : {1}".format(url, traceback.format_exc()))

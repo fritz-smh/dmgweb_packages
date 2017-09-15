@@ -67,6 +67,11 @@ Then, fill the configuration file **config.json**
           "access_token" :  "xxxx-Qczs1xAuXZlomypi2D6eRBaS2XTCGeRryeNK3b4",
           "access_token_secret" : "xxxx"
         },
+      "metrics" :
+        {
+          "url" : "http://metrics.domogik.org:3000",
+          "token" : "theauthenticationtoken",
+        },
       "root_repository" : "http://xxxx/",
       "domogik_releases" : [
         "0.4.0", "0.4.1", "0.4.2", "0.5.0", "0.5.1", "0.5.2", "0.6.0"
@@ -76,6 +81,23 @@ Then, fill the configuration file **config.json**
 The **skip** part in the **github** part allow to skip the Github authentication for development purpose. It should be set to false in production!!!!
 
 The following example assume the current user ($LOGNAME) is the user which will run the tool.
+
+Create a NGINX configuration file :
+
+    server {
+        listen 80;
+        server_name packages.domogik.org;
+        #started with /etc/init.d/dmgweb_packages
+    
+        access_log /var/log/nginx/packages.domogik.org.log;
+    
+        location / { try_files $uri @yourapplication; }
+        location @yourapplication {
+            include uwsgi_params;
+            uwsgi_pass unix:/tmp/www-packages.sock;
+        }
+    }
+
 
 Create an **init.d** file. From the *dmgweb_packages* folder, run as **root** :
 

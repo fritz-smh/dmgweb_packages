@@ -1,0 +1,18 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+
+<div class="container">
+  <h1>{% trans %}Help - Locked features{% endtrans %}</h1>
+
+  <h2>{% trans %}Managing a package{% endtrans %}</h2>
+
+  <p>{% trans %}When you want to manage a package release, (changing its status for example) after publishing a new release, you may be unable to do this action. This is a normal feature : some actions are restricted to packages moderators. If you should be a package moderator or want to become one, please contact us over irc.{% endtrans %}</p>
+
+  <p>{% trans %}Find below a direct access to our irc channel.{% endtrans %}</p>
+
+  <iframe src="http://webchat.freenode.net?randomnick=1&channels=%23domogik&uio=d4" width="647" height="400"></iframe>
+
+</div>
+{% endblock %}
+

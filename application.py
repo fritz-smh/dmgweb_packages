@@ -212,10 +212,12 @@ app.domogik_releases = app.my_config.get_domogik_releases()
 
 ### Views
 from dmgweb_packages.views.index import * 
+from dmgweb_packages.views.data import * 
 from dmgweb_packages.views.github import * 
 from dmgweb_packages.views.packages_management import * 
 from dmgweb_packages.views.icons import * 
 from dmgweb_packages.views.help import * 
+from dmgweb_packages.views.api_crontab import * 
 
 
 ### main
