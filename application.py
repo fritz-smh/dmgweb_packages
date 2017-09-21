@@ -125,7 +125,7 @@ def login_required(f):
 def core_team_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        app.logger.debug("Core team member required for this url.g.core_team = {0}".format(g.core_team))
+        app.logger.debug("Core team member required for this url. g.core_team = {0}".format(g.core_team))
         #if not g.core_team:
         #    app.logger.warning("Access denied to this url (core team only). Redirect to the index url")
         #    flash("Access denied !")
@@ -142,6 +142,7 @@ def before_request():
     if GITHUB_AUTH_SKIPPING == True:
         # we skip the authentication : 'dev mode'
         g.username = "@developper"
+        g.core_team = True
 
     else:
         # we DO the authentication

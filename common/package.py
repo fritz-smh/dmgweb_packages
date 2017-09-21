@@ -14,6 +14,7 @@ import uuid
 ###from dmgweb_packages.common.tweet import tweet_message
 from operator import itemgetter
 from operator import attrgetter
+import sqlite3
 
 # python 2 and 3
 try:
@@ -36,7 +37,8 @@ ICON_FILE = "design/icon.png"
 # dmwweb_package
 ICONS_DIR = "{0}/../data/icons/".format(os.path.dirname(os.path.realpath(__file__)))
 PWD = os.path.dirname(os.path.realpath(__file__))
-PACKAGES = "{0}/../data/packages.json".format(PWD)
+#PACKAGES = "{0}/../data/packages.json".format(PWD)
+PACKAGES_DB = "{0}/../data/packages.db".format(PWD)
 
 # allowed mime types for packages download
 MIME_ZIP = 'application/zip'
@@ -55,7 +57,7 @@ USER_SERVICE = "@system@"
 ### Releases status
 STATUS = {
            'SUBMITTED' : "Submitted",
-           'AUTO_REVIEW_OK' : "Automatic review OK",
+           'AUTO_REVIEW_DONE' : "Automatic review done",
            'MANUAL_REVIEW_OK' : "Manuel review OK",
            'BETA' : "Beta",
            'STABLE' : "Stable",
@@ -65,7 +67,8 @@ STATUS = {
          }
 
 NEXT_STATUS = {
-                'AUTO_REVIEW_OK' : ['MANUAL_REVIEW_OK', 'KO'],
+                'SUBMITTED' : [],
+                'AUTO_REVIEW_DONE' : ['MANUAL_REVIEW_OK', 'KO'],
                 'MANUAL_REVIEW_OK' : ['BETA', 'KO'],
                 'BETA' : ['STABLE', 'KO'],
                 'STABLE' : ['BETA', 'ARCHIVED',' KO'],
@@ -80,6 +83,20 @@ def timestamp_to_datetime(date, fmt=None):
     if fmt is None:
         fmt = "%d %B %Y, %H:%M"
     return format(datetime.datetime.fromtimestamp(date), fmt)
+
+
+def json_dumps(data):
+    data = json.dumps(data)
+    data = data.replace("'", "\'") \
+               .replace('"', '\"')
+    print(data)
+    return data
+
+
+def json_loads(data):
+    data = data.replace("\'", "'") \
+               .replace('\"', '"')
+    return json.loads(data)
 
 
 class PackageError(Exception):
@@ -257,31 +274,54 @@ class Packages():
     def __init__(self, logger):
         self.logger = logger
         ### load the json
-        # check if the file exists
-        if os.path.isfile(PACKAGES):
-            self.logger.debug(u"The packages file '{0}' exists : loading it".format(PACKAGES))
-            try:
-                self.json = json.load(open(PACKAGES))
-            except:
-                msg = u"Error while reading the packages file '{0}'. Error is : {1}".format(PACKAGES, traceback.format_exc())
-                self.logger.error(msg)
-                raise PackageError(msg)
-        else:
-            self.logger.debug(u"The packages file '{0}' does not exists : starting from an empty list".format(PACKAGES))
-            self.json = []
+        
+        #-* old way : file *-#
+        # # check if the file exists
+        # if os.path.isfile(PACKAGES):
+        #     self.logger.debug(u"The packages file '{0}' exists : loading it".format(PACKAGES))
+        #     try:
+        #         self.json = json.load(open(PACKAGES))
+        #     except:
+        #         msg = u"Error while reading the packages file '{0}'. Error is : {1}".format(PACKAGES, traceback.format_exc())
+        #         self.logger.error(msg)
+        #         raise PackageError(msg)
+        # else:
+        #     self.logger.debug(u"The packages file '{0}' does not exists : starting from an empty list".format(PACKAGES))
+        #     self.json = []
+
+        #-* new way : sqlite *-#
+        self.logger.info(u"Open database '{0}'...".format(PACKAGES_DB))
+        self.db = sqlite3.connect(PACKAGES_DB)
+        cursor = self.db.cursor()
+        cursor.execute('''CREATE TABLE IF NOT EXISTS packages
+                               (id INTEGER PRIMARY KEY, type TEXT, name TEXT, json TEXT)''')
+        cursor.execute('''CREATE TABLE IF NOT EXISTS notes
+                               (id INTEGER PRIMARY KEY, type TEXT, name TEXT, json TEXT)''')
+        self.db.commit()
 
     def list(self, form = True):
         """ Return the list of packages (not the releases, the packages)
         """
+
+        # TODO : base sqlite
+        # TODO : base sqlite
+        # TODO : base sqlite
+
+        cursor = self.db.cursor()
+        cursor.execute('SELECT id, type, name, json FROM packages')
+
         # format for a form (to be displayed in a dropdown list)
         if form:
             pkg_list = []
-            for pkg in self.json:
+            for item in cursor:
+                pkg = json_loads(item[3])
+                print(pkg)
                 pkg_list.append((pkg['package_id'], pkg['package_id']))
             return sorted(pkg_list)
         else:
             pkg_list = []
-            for pkg in self.json:
+            for item in cursor:
+                pkg = json_loads(item[3])
                 pkg_list.append({'type' : pkg['type'], 'name' : pkg['name']})
             return pkg_list
     
@@ -289,28 +329,68 @@ class Packages():
     def get_packages(self):
         """ Return all packages
         """
-        #return self.json
-        return sorted(self.json, key=itemgetter('type', 'name'), reverse = False)
+
+        # TODO : base sqlite
+        # TODO : base sqlite
+        # TODO : base sqlite
+
+        #return sorted(self.json, key=itemgetter('type', 'name'), reverse = False)
+
+        cursor = self.db.cursor()
+        cursor.execute('SELECT id, json FROM packages')
+        all_pkg = []
+        for item in cursor:
+            pkg = json_loads(item[1])
+            all_pkg.append(pkg)
+        return sorted(all_pkg, key=itemgetter('type', 'name'), reverse = False)
 
        
     def get_packages_releases(self):
         """ Return all packages releases
         """
+
+        # TODO : base sqlite
+        # TODO : base sqlite
+        # TODO : base sqlite
+
+        cursor = self.db.cursor()
+        cursor.execute('SELECT id, json FROM packages')
+
         pkg_rel_list = []
-        for pkg in self.json:
+        for item in cursor:
+            pkg = json_loads(item[1])
             pkg_rel_list.extend(pkg['releases'])
         return pkg_rel_list
 
        
     def is_package_existing(self, pkg_type, pkg_name):
-        for pkg in self.json:
-           if pkg["type"] == pkg_type and pkg["name"] == pkg_name:
-               return True
+
+        # TODO : base sqlite
+        # TODO : base sqlite
+        # TODO : base sqlite
+
+        cursor = self.db.cursor()
+        cursor.execute("SELECT count(*) FROM packages WHERE type=? and name=?", (pkg_type, pkg_name))
+        for item in cursor:
+            print(item)
+            if item[0] > 0:
+                return True
+            #pkg = json_loads(item[1])
+            #if pkg["type"] == pkg_type and pkg["name"] == pkg_name:
+            #    return True
         return False
    
-    def save(self):
+    # TO DELETE : no more save to do, each function will do the save itself by update db
+    # TO DELETE : no more save to do, each function will do the save itself by update db
+    # TO DELETE : no more save to do, each function will do the save itself by update db
+    def OFF_save(self):
         """ Save the packages list
         """
+
+        # TODO : base sqlite
+        # TODO : base sqlite
+        # TODO : base sqlite
+
         self.logger.info(u"Saving JSON...")
         try:
             my_file = open(PACKAGES, "w")
@@ -324,6 +404,11 @@ class Packages():
     
 
     def add(self, pkg_type, pkg_name, pkg_email, pkg_site, user):
+
+        # TODO : base sqlite
+        # TODO : base sqlite
+        # TODO : base sqlite
+
         """ add a package (not a package release) to the list
         """
         self.logger.info("Add a package (not a release) : '{0}_{1}' by '{2} / {3}', website is '{4}'".format(pkg_type, pkg_name, pkg_email, user, pkg_site))
@@ -342,23 +427,35 @@ class Packages():
 
 
         # check unicity
-        for pkg in self.json:
-           if pkg["type"] == pkg_type and pkg["name"] == pkg_name:
-               msg = "This package has already been submitted by '{0}' (unique key is type/name)".format(pkg["author_email"])
-               self.logger.error(msg)
-               raise PackageError(msg)
+        cursor = self.db.cursor()
+        cursor.execute('SELECT id, type, name, json FROM packages')
+        for item in cursor:
+            #pkg = json.loads(item[1])
+            #if pkg["type"] == pkg_type and pkg["name"] == pkg_name:
+            if item[1] == pkg_type and item[2] == pkg_name:
+                msg = "This package has already been submitted by '{0}' (unique key is type/name)".format(pkg["author_email"])
+                self.logger.error(msg)
+                raise PackageError(msg)
         # add in the list
-        self.json.append(pkg_data)
+        #self.json.append(pkg_data)
+        cursor = self.db.cursor()
+        cursor.execute("INSERT INTO packages (type, name, json) VALUES (?, ?, ?)", (pkg_type, pkg_name, json_dumps(pkg_data)))
+        self.db.commit()
         self.add_note(pkg_type=pkg_type, 
                       pkg_name=pkg_name, 
                       content = u"<kbd>Package created</kbd>",
-                      user = user,
-                      do_save=False)
-        self.save()
+                      user = user)
+        #              do_save=False)
+        #self.save()
         msg = "New package created : '{0}_{1}'".format(pkg_type, pkg_name)
         self.logger.info(msg)
 
     def add_release(self, pkg_type, pkg_name, pkg_release, pkg_url, pkg_author, pkg_tags, pkg_description, pkg_domogik_min_release, user):
+
+        # TODO : base sqlite
+        # TODO : base sqlite
+        # TODO : base sqlite
+
         """
            package format : 
               {
@@ -370,7 +467,7 @@ class Packages():
                 'url_tests' : 'http://......',
                 'url_review' : '/reviews/plugin_weather_1.1.html',
                 'status' : 'SUBMITTED',    // values : .....
-                'next_status' : NEXT_STATUS['AUTO_REVIEW_OK'],
+                'next_status' : NEXT_STATUS['SUBMITTED'],
                 'author' : ...,
                 'tags' : ...,
                 'description' : ...,
@@ -380,52 +477,59 @@ class Packages():
         """
 
         try:
-            for pkg in self.json:
-               if pkg["type"] == pkg_type and pkg["name"] == pkg_name:
-                   # check unicity
-                   for rel in pkg['releases']:
-                       if pkg_release == rel['release']:
-                           msg = u"This package release has already been submitted (unique key is type/name/release)"
-                           self.logger.error(msg)
-                           raise PackageError(msg)
-    
-                   # add package release to the list of releases
-                   pkg_helper = PackageHelper(self.logger, pkg_type, pkg_name, pkg_url, pkg_release)
-                   pkg_url_doc = pkg_helper.find_documentation_url()
-                   pkg_url_tests_img = pkg_helper.find_travis_ci_status_image_url()
-                   pkg_url_tests = pkg_helper.find_travis_ci_url()
-                   review_file = pkg_helper.get_review_file()
-                   pkg_data = {
-                                'type' : pkg_type,
-                                'name' : pkg_name,
-                                'release' : pkg_release,
-                                'url_package' : pkg_url,
-                                'url_documentation' : pkg_url_doc,
-                                'url_tests_img' : pkg_url_tests_img,
-                                'url_tests' : pkg_url_tests,
-                                'review' : review_file,
-                                'status' : 'AUTO_REVIEW_OK',
-                                'next_status' : NEXT_STATUS['AUTO_REVIEW_OK'],
-                                'author' : pkg_author,
-                                'tags' : pkg_tags,
-                                'description' : pkg_description,
-                                'domogik_min_release' : pkg_domogik_min_release,
-                                'submitter' : user,
-                                'timestamp' : time.time()
-                              }
-                   pkg['releases'].append(pkg_data)
-
-                   # sort the releases by number desc
-                   pkg['releases'] =  sorted(pkg['releases'], key=itemgetter('release'), reverse = True)
-
-                   self.add_note(pkg_type=pkg_type, 
-                                 pkg_name=pkg_name, 
-                                 content = u"<kbd>New release '{0}'</kbd>".format(pkg_release),
-                                 user = user,
-                                 do_save=False)
-                   self.save()
-                   msg = u"New package release added : '{0}_{1}' version '{2}' from url '{3}'".format(pkg_type, pkg_name, pkg_release, pkg_url)
-                   self.logger.info(msg)
+            cursor = self.db.cursor()
+            cursor.execute('SELECT id, type, name, json FROM packages')
+            for item in cursor:
+                pkg_iddb = item[0]
+                pkg = json_loads(item[3])
+                if item[1] == pkg_type and item[2] == pkg_name:
+                    # check unicity
+                    for rel in pkg['releases']:
+                        if pkg_release == rel['release']:
+                            msg = u"This package release has already been submitted (unique key is type/name/release)"
+                            self.logger.error(msg)
+                            raise PackageError(msg)
+     
+                    # add package release to the list of releases
+                    pkg_helper = PackageHelper(self.logger, pkg_type, pkg_name, pkg_url, pkg_release)
+                    pkg_url_doc = pkg_helper.find_documentation_url()
+                    pkg_url_tests_img = pkg_helper.find_travis_ci_status_image_url()
+                    pkg_url_tests = pkg_helper.find_travis_ci_url()
+                    review_file = pkg_helper.get_review_file()
+                    pkg_data = {
+                                 'type' : pkg_type,
+                                 'name' : pkg_name,
+                                 'release' : pkg_release,
+                                 'url_package' : pkg_url,
+                                 'url_documentation' : pkg_url_doc,
+                                 'url_tests_img' : pkg_url_tests_img,
+                                 'url_tests' : pkg_url_tests,
+                                 'review' : review_file,
+                                 'status' : 'SUBMITTED',
+                                 'next_status' : NEXT_STATUS['SUBMITTED'],
+                                 'author' : pkg_author,
+                                 'tags' : pkg_tags,
+                                 'description' : pkg_description,
+                                 'domogik_min_release' : pkg_domogik_min_release,
+                                 'submitter' : user,
+                                 'timestamp' : time.time()
+                               }
+                    pkg['releases'].append(pkg_data)
+ 
+                    # sort the releases by number desc
+                    pkg['releases'] =  sorted(pkg['releases'], key=itemgetter('release'), reverse = True)
+ 
+                    self.add_note(pkg_type=pkg_type, 
+                                  pkg_name=pkg_name, 
+                                  content = u"<kbd>New release '{0}'</kbd>".format(pkg_release),
+                                  user = user)
+                    #              do_save=False)
+                    #self.save()
+                    cursor = self.db.cursor()
+                    cursor.execute("UPDATE packages SET json=? WHERE type=? AND name=?", (json_dumps(pkg), pkg_type, pkg_name))
+                    self.db.commit()
+                    msg = u"New package release added : '{0}_{1}' version '{2}' from url '{3}'".format(pkg_type, pkg_name, pkg_release, pkg_url)
+                    self.logger.info(msg)
         except PackageError as e:
            raise PackageError(e.value)
         except:
@@ -434,58 +538,93 @@ class Packages():
            raise PackageError(msg)
 
     def get_informations(self, pkg_type, pkg_name):
+
+        # TODO : base sqlite
+        # TODO : base sqlite
+        # TODO : base sqlite
+
         """ Return a list of the basic informations
         """
-        for pkg in self.json:
-           if pkg["type"] == pkg_type and pkg["name"] == pkg_name:
-               # TODO : clean releases, issues, notes
-               return pkg
+        cursor = self.db.cursor()
+        cursor.execute('SELECT id, type, name, json FROM packages')
+        for item in cursor:
+            if item[1] == pkg_type and item[2] == pkg_name:
+                pkg = json_loads(item[3])
+                # TODO : clean releases, issues, notes
+                return pkg
         return {}
             
     def get_releases(self, pkg_type, pkg_name):
+
+        # TODO : base sqlite
+        # TODO : base sqlite
+        # TODO : base sqlite
+
         """ Return a list of the releases
         """
-        for pkg in self.json:
-           if pkg["type"] == pkg_type and pkg["name"] == pkg_name:
-               return sorted(pkg['releases'], key=itemgetter('release'), reverse = True)
+        cursor = self.db.cursor()
+        cursor.execute('SELECT id, type, name, json FROM packages')
+        for item in cursor:
+            if item[1] == pkg_type and item[2] == pkg_name:
+                pkg = json_loads(item[3])
+                return sorted(pkg['releases'], key=itemgetter('release'), reverse = True)
         return []
             
     def get_notes(self, pkg_type, pkg_name):
+
+        # TODO : base sqlite
+        # TODO : base sqlite
+        # TODO : base sqlite
+
         """ Return a list of the notes
         """
-        for pkg in self.json:
-           if pkg["type"] == pkg_type and pkg["name"] == pkg_name:
-               return sorted(pkg['notes'], key=itemgetter('timestamp'), reverse = True)
-        return []
+        cursor = self.db.cursor()
+        cursor.execute("SELECT id, type, name, json FROM notes WHERE type='{0}' and name='{1}'".format(pkg_type, pkg_name))
+        notes = []
+        for item in cursor:
+            notes.append(json_loads(item[3]))
+        return sorted(notes, key=itemgetter('timestamp'), reverse = True)
 
     def add_note(self, pkg_type, pkg_name, content, user=None, do_save=True):
+
+        # TODO : base sqlite
+        # TODO : base sqlite
+        # TODO : base sqlite
+
         """ Add a note to a package
             The do_save option allows to not save in case this function is called from another one that will make the save action
         """
         if user is None:
             user = "Anonymous"
         self.logger.debug(u"Try to add a note to '{0}-{1}' with content '{2}' from '{3}'".format(pkg_type, pkg_name, content, user))
-        for pkg in self.json:
-            if pkg["type"] == pkg_type and pkg["name"] == pkg_name:
-                self.logger.debug(u"Add a note to '{0}-{1}' with content '{2}' from '{3}'".format(pkg_type, pkg_name, content, user))
-                pkg['notes'].append({
-                                      'author' : user,
-                                      'content' : content,
-                                      'timestamp' : time.time()
-                                    })
-                if do_save:
-                    self.save()
-                return True
-        return False
+        self.logger.debug(u"Add a note to '{0}-{1}' with content '{2}' from '{3}'".format(pkg_type, pkg_name, content, user))
+        note= {
+                'author' : user,
+                'content' : content,
+                'timestamp' : time.time()
+              }
+        
+        cursor = self.db.cursor()
+        cursor.execute("INSERT INTO notes (type, name, json) VALUES (?, ?, ?)", (pkg_type, pkg_name, json_dumps(note)))
+        self.db.commit()
+        return True
 
     def set_status(self, pkg_type, pkg_name, pkg_release, new_status, user=None):
+
+        # TODO : base sqlite
+        # TODO : base sqlite
+        # TODO : base sqlite
+
         """ Change a package status
         """
         if user is None:
             user = "Anonymous"
         self.logger.debug(u"Try to change the status of '{0}-{1}' version '{2}' to '{3}' from '{4}'".format(pkg_type, pkg_name, pkg_release, new_status, user))
-        for pkg in self.json:
-            if pkg["type"] == pkg_type and pkg["name"] == pkg_name:
+        cursor = self.db.cursor()
+        cursor.execute('SELECT id, type, name, json FROM packages')
+        for item in cursor:
+            pkg = json_loads(item[3])
+            if item[1] == pkg_type and item[2] == pkg_name:
                 for rel in pkg["releases"]:
                     if rel["release"] == pkg_release:
                         # TODO : check if the change can be done
@@ -497,20 +636,31 @@ class Packages():
                         self.add_note(pkg_type=pkg_type, 
                                       pkg_name=pkg_name, 
                                       content = u"Version <kbd>{0}</kbd> status set to <kbd>{1}</kbd>".format(pkg_release, new_status),
-                                      user = user,
-                                      do_save=False)
-                        self.save()
+                                      user = user)
+                        #              do_save=False)
+                        #self.save()
+                        cursor = self.db.cursor()
+                        cursor.execute("UPDATE packages SET json=? WHERE type=? AND name=?", (json_dumps(pkg), pkg_type, pkg_name))
+                        self.db.commit()
                         return True
         return False
 
     def set_domogik_max_release(self, pkg_type, pkg_name, pkg_release, max_release, user=None):
+
+        # TODO : base sqlite
+        # TODO : base sqlite
+        # TODO : base sqlite
+
         """ Set a domogik max release to handle broken compatiblity
         """
         if user is None:
             user = "Anonymous"
         self.logger.debug(u"Try to set the Domogik max compliant release of '{0}-{1}' version '{2}' to '{3}' from '{4}'".format(pkg_type, pkg_name, pkg_release, max_release, user))
-        for pkg in self.json:
-            if pkg["type"] == pkg_type and pkg["name"] == pkg_name:
+        cursor = self.db.cursor()
+        cursor.execute('SELECT id, type, name, json FROM packages')
+        for item in cursor:
+            pkg = json_loads(item[1])
+            if item[1] == pkg_type and item[2] == pkg_name:
                 for rel in pkg["releases"]:
                     if rel["release"] == pkg_release:
                         self.logger.debug(u"Change the Domogik max compliant release of '{0}-{1}' version '{2}' to '{3}' from '{4}'".format(pkg_type, pkg_name, pkg_release, max_release, user))
@@ -518,9 +668,12 @@ class Packages():
                         self.add_note(pkg_type=pkg_type, 
                                       pkg_name=pkg_name, 
                                       content = u"Version <kbd>{0}</kbd> Domogik max compliant release set to <kbd>{1}</kbd>".format(pkg_release, max_release),
-                                      user = user,
-                                      do_save=False)
-                        self.save()
+                                      user = user)
+                        #              do_save=False)
+                        #self.save()
+                        cursor = self.db.cursor()
+                        cursor.execute("UPDATE packages SET json=? WHERE type=? AND name=?", (json_dumps(pkg), pkg_type, pkg_name))
+                        self.db.commit()
                         return True
         return False
 

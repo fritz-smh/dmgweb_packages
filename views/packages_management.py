@@ -347,12 +347,16 @@ def submit_new_package_release_async():
     # Execute the review as a background task
     try:
         review_bin = os.path.join(PWD, "..", "start-review.sh")
-        cmd = "nohup {0} {1} {2} {3} {4} &".format(review_bin, pkg_type, pkg_name, pkg_release, pkg_path) 
+        cmd = "/usr/bin/nohup {0} {1} {2} {3} {4} &".format(review_bin, pkg_type, pkg_name, pkg_release, pkg_path) 
         app.logger.info(u"Execute review : {0}".format(cmd))
         p = Popen(cmd, 
-                  stdout=PIPE,
-                  stderr=PIPE,
-                  shell = True)
+                  #stdout=PIPE,
+                  #stderr=PIPE,
+                  stdout=open('/dev/null', 'w'),
+                  stderr=open('/dev/null', 'w'),
+                  shell=True,
+                  preexec_fn=os.setpgrp,
+                  close_fds=True)
         res = p.communicate()
         app.logger.info(u"Review launched in background!")
     except:
