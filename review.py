@@ -36,6 +36,7 @@ class Review:
 
         self.config = Config()
         self.review_command = self.config.get_review_command()
+        self.api_token = self.config.get_api_token()
         self.api_server = self.config.get_server_ip()
         if self.api_server == "0.0.0.0":
             # override a non usable value
@@ -111,6 +112,7 @@ class Review:
         try:
             url = "http://{0}:{1}/set_status".format(self.api_server, self.api_port)
             data = {
+                     "api_token" : self.api_token,      # this one override the login for some urls
                      "type" : self.type,  
                      "name" : self.name,  
                      "release" : self.release,  

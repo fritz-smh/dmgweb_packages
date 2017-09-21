@@ -86,6 +86,7 @@ Bootstrap(app)
 app.my_config = Config()
 app.next_url = "/"  # used by github login
 app.GITHUB_AUTH_SKIPPING = GITHUB_AUTH_SKIPPING
+app.api_token = app.my_config.get_api_token()
 
 
 ###### Database part
@@ -116,8 +117,17 @@ def login_required(f):
         else:
             # we DO the authentication
             if g.user is None:
-                app.logger.debug("Redirect to the login url")
-                return redirect(url_for('login', next=request.url))
+                # handle access on some url with an api token defined in config.json
+                if 'api_token' in request.form:
+                    if request.form['api_token'] == app.api_token:
+                        app.logger.info(u"Valid API token given : '{0}...'".format(request.form['api_token'][0:3]))
+                    else:
+                        app.logger.warning(u"Invalid API token given : '{0}...'".format(request.form['api_token'][0:3]))
+                        app.logger.debug("Redirect to the login url")
+                        return redirect(url_for('login', next=request.url))
+                else:
+                    app.logger.debug("Redirect to the login url")
+                    return redirect(url_for('login', next=request.url))
         return f(*args, **kwargs)
     return decorated_function
 
