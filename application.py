@@ -108,7 +108,7 @@ class User(Base):
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        app.logger.debug("Login required for this url. g.user = {0}".format(g.user))
+        app.logger.debug("Login required for this url '{0}'. g.user = {1}".format(request.url, g.user))
         if GITHUB_AUTH_SKIPPING == True:
             app.logger.warning("Development mode : AUTHENTICATION SKIPPED (see config.json => github>skip")
             # we skip the authentication : 'dev mode'
