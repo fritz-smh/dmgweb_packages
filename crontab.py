@@ -105,7 +105,7 @@ if __name__ == "__main__":
 
     # logging - file handler
     formatter = logging.Formatter('[%(asctime)s] [%(levelname)s] %(message)s')
-    handler = logging.FileHandler("{0}/review.log".format(LOG_FOLDER), mode='a')
+    handler = logging.FileHandler("{0}/crontab.log".format(LOG_FOLDER), mode='a')
     handler.setFormatter(formatter)
     handler.setLevel(logging.DEBUG)
     log.addHandler(handler)
