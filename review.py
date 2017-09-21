@@ -145,7 +145,11 @@ if __name__ == "__main__":
     log.addHandler(stdout_handler)
     log.info("=============================================================")
 
-
+    log.info(u"Parameters :")
+    log.info(u"- type = {0}".format(sys.argv[1]))
+    log.info(u"- name = {0}".format(sys.argv[2]))
+    log.info(u"- release = {0}".format(sys.argv[3]))
+    log.info(u"- package_path = {0}".format(sys.argv[4]))
     R = Review(type = sys.argv[1],
                name = sys.argv[2],
                release = sys.argv[3],
