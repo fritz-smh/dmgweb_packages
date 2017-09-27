@@ -90,7 +90,7 @@ class DailyMetrics:
             log.info(u"  ...ok")
             log.info(u"get_weekly_packages_usage > DONE")
         except:
-            log.error(u"get_weekly_packages_usage > ERROR while calling url '{0}'. Error is : {1}".format(url, traceback.format_exc()))
+            log.error(u"get_weekly_packages_usage > ERROR while calling url '{0}'. Error is : {1}".format(full_url, traceback.format_exc()))
             # in case of error, put a proper 'no data' picture
             try:
                 shutil.copyfileobj(os.path.join(PWD, NO_DATA_PICTURE), target_file)

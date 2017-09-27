@@ -121,6 +121,7 @@ def login_required(f):
                 if 'api_token' in request.form:
                     if request.form['api_token'] == app.api_token:
                         app.logger.info(u"Valid API token given : '{0}...'".format(request.form['api_token'][0:3]))
+                        g.core_team = True
                     else:
                         app.logger.warning(u"Invalid API token given : '{0}...'".format(request.form['api_token'][0:3]))
                         app.logger.debug("Redirect to the login url")
