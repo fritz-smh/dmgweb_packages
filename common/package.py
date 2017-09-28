@@ -492,9 +492,9 @@ class Packages():
      
                     # add package release to the list of releases
                     pkg_helper = PackageHelper(self.logger, pkg_type, pkg_name, pkg_url, pkg_release)
-                    pkg_url_doc = pkg_helper.find_documentation_url()
-                    pkg_url_tests_img = pkg_helper.find_travis_ci_status_image_url()
-                    pkg_url_tests = pkg_helper.find_travis_ci_url()
+                    pkg_url_doc = pkg_helper.get_documentation_url()
+                    pkg_url_tests_img = pkg_helper.get_travis_ci_status_image_url()
+                    pkg_url_tests = pkg_helper.get_travis_ci_url()
                     review_file = pkg_helper.get_review_file()
                     pkg_data = {
                                  'type' : pkg_type,
@@ -677,6 +677,30 @@ class Packages():
                         return True
         return False
 
+    def get_develop_package_url(self, pkg_type, pkg_name):
+        """ Return the development package url
+        """
+        pkg_helper = PackageHelper(self.logger, pkg_type, pkg_name)
+        return pkg_helper.get_develop_package_url()
+
+    def get_develop_package_documentation_url(self, pkg_type, pkg_name):
+        """ Return the development package documentation url
+        """
+        pkg_helper = PackageHelper(self.logger, pkg_type, pkg_name)
+        return pkg_helper.get_develop_package_documentation_url()
+
+    def get_develop_package_travis_ci_status_image_url(self, pkg_type, pkg_name):
+        """ Return the development package url
+        """
+        pkg_helper = PackageHelper(self.logger, pkg_type, pkg_name)
+        return pkg_helper.get_develop_package_travis_ci_status_image_url()
+
+    def get_develop_package_travis_ci_url(self, pkg_type, pkg_name):
+        """ Return the development package url
+        """
+        pkg_helper = PackageHelper(self.logger, pkg_type, pkg_name)
+        return pkg_helper.get_develop_package_travis_ci_url()
+
     def get_issues(self, pkg_type, pkg_name):
         """ Return a list of the issues
         """
@@ -730,14 +754,21 @@ class PackageHelper:
         except:
             self.logger.error(u"Error while trying to find Github informations for '{0}-{1}'. Error is : {2}".format(self.type, self.name, traceback.format_exc()))
 
-    def find_documentation_url(self):
+    def get_documentation_url(self):
         """
            return : url
         """
         url = "http://domogik-{0}-{1}.readthedocs.io/en/{2}/".format(self.type, self.name, self.release)
         return url
 
-    def find_travis_ci_status_image_url(self):
+    def get_develop_package_documentation_url(self):
+        """
+           return : url
+        """
+        url = "http://domogik-{0}-{1}.readthedocs.io/en/develop/".format(self.type, self.name)
+        return url
+
+    def get_travis_ci_status_image_url(self):
         """
            return : url of a picture or None
         """
@@ -747,7 +778,17 @@ class PackageHelper:
         url = "https://travis-ci.org/{0}/{1}.svg?branch={2}".format(self.user, self.repo, self.release)
         return url
 
-    def find_travis_ci_url(self):
+    def get_develop_package_travis_ci_status_image_url(self):
+        """
+           return : url of a picture or None
+        """
+        if self.user is None:
+            self.logger.info(u"'{0}-{1}' website is not a Github one : '{2}'. The Travis CI url can't be built.".format(self.type, self.name, self.pkg_info['site']))
+            return None
+        url = "https://travis-ci.org/{0}/{1}.svg?branch=develop".format(self.user, self.repo)
+        return url
+
+    def get_travis_ci_url(self):
         """
            return : url
         """
@@ -756,6 +797,12 @@ class PackageHelper:
             return None
         url = "https://travis-ci.org/{0}/{1}/branches".format(self.user, self.repo)
         return url
+
+    def get_develop_package_travis_ci_url(self):
+        """
+           return : url
+        """
+        return self.get_travis_ci_url()
 
     def get_review_file(self):
         """
@@ -845,3 +892,24 @@ class PackageHelper:
             self.logger.error(u"Error while trying to find Github pull requests for '{0}-{1}'. Error is : {2}".format(self.type, self.name, traceback.format_exc()))
             resp = [u"An error occured... Please check the logs"]
         return resp
+
+
+
+    def get_develop_package_url(self):
+        """ Find the develop release zip url
+        """
+        resp = None
+        try:
+            self.logger.debug(u"Try to find from Github url the url to download the develop release '{0}-{1}'. Site url is '{2}'".format(self.type, self.name, self.pkg_info['site']))
+            if self.user is None:
+                return None
+      
+            url = "https://github.com/{0}/{1}/archive/develop.zip".format(self.user, self.repo)
+            resp = url
+
+        except:
+            self.logger.error(u"Error while trying to find from Github url the url to download the develop release '{0}-{1}'. Error is : {2}".format(self.type, self.name, traceback.format_exc()))
+        self.logger.debug(u"Github from Github url the url to download the develop release '{0}-{1}' is '{2}'".format(self.type, self.name, resp))
+        return resp
+
+

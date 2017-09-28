@@ -331,6 +331,65 @@ window.history.replaceState("object or string", "{{ package_id }}", "/manage_a_p
 
       <div class="panel panel-primary">
         <div class="panel-heading">
+          <h3 class="panel-title">{% trans %}Development package{% endtrans %}</h3>
+        </div>
+        {% if develop_package_url == None %}
+          <div class="panel-body">{% trans %}No development package found.{% endtrans %}</div>
+        {% else %}
+          <table class="table">
+            <tr>
+              <td>{% trans %}Package url{% endtrans %}</td>
+              <td><a href="{{ develop_package_url }}">{{ develop_package_url }}</a></td>
+            </tr>
+            <tr>
+              <td>{% trans %}Documentation{% endtrans %}</td>
+              <td>
+                <p><a href="{{ develop_package_documentation_url }}">{{ develop_package_documentation_url }}</a> </p>
+                <p id="doc-develop"></p>
+              </td>
+            </tr>
+            <tr>
+              <td>{% trans %}Tests{% endtrans %}</td>
+              <td>
+                {% if develop_package_travis_ci_status_image_url != None %}
+                  <p>
+                    {% trans %}Build : {% endtrans %}<img src="{{ develop_package_travis_ci_status_image_url }}">
+                  </p>
+                {% endif %}
+                {% if develop_package_travis_ci_url != None %}
+                  <p>
+                    <a href="{{ develop_package_travis_ci_url }}">{% trans %}Build details{% endtrans %}</a>
+                  </p>
+                {% else %}
+                  <div class="alert alert-danger">
+                    {% trans %}Warning : no automated tests defined!{% endtrans %}
+                  </div>
+                {% endif %}
+              </td>
+            </tr>
+          </table>
+        {% endif %}
+      </div>
+      <script type="text/javascript">
+        // Check the documentation URL /////////////////////
+        $.post("{{ url_for("check_url") }}", { url : "{{ develop_package_documentation_url }}" })
+        .done(function( data ) {
+          $('#doc-develop').html(data);
+          console.log(data);
+        })
+        .fail(function( xhr, textStatus, errorThrown ) {
+          $('#doc-develop').html("{% trans %}Error while checking doc url : {% endtrans %}" + xhr.responseText);
+        })
+        .always(function() {
+        });
+      </script>
+
+
+
+      <hr>
+
+      <div class="panel panel-primary">
+        <div class="panel-heading">
           <h3 class="panel-title">{% trans %}Opened pull requests{% endtrans %}</h3>
         </div>
         {% if pull_requests|length == 0 %}

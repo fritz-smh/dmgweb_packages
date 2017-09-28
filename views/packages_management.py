@@ -99,6 +99,11 @@ def manage_a_package():
         pkg_new_issue_url = app.packages.get_new_issue_url(pkg_type, pkg_name)
         pkg_issues = app.packages.get_issues(pkg_type, pkg_name)
         pkg_pull_requests = app.packages.get_pull_requests(pkg_type, pkg_name)
+        # about the develop branch...
+        pkg_develop_package_url = app.packages.get_develop_package_url(pkg_type, pkg_name)
+        pkg_develop_package_documentation_url = app.packages.get_develop_package_documentation_url(pkg_type, pkg_name)
+        pkg_develop_package_travis_ci_status_image_url = app.packages.get_develop_package_travis_ci_status_image_url(pkg_type, pkg_name)
+        pkg_develop_package_travis_ci_url = app.packages.get_develop_package_travis_ci_url(pkg_type, pkg_name)
     except:
         app.logger.error(u"Error while getting package informations. Error is : {0}".format(traceback.format_exc()))
         # TODO: dedicated error page
@@ -117,6 +122,10 @@ def manage_a_package():
                            new_issue_url = pkg_new_issue_url,
                            issues = pkg_issues,
                            pull_requests = pkg_pull_requests,
+                           develop_package_url = pkg_develop_package_url,
+                           develop_package_documentation_url = pkg_develop_package_documentation_url,
+                           develop_package_travis_ci_status_image_url = pkg_develop_package_travis_ci_status_image_url,
+                           develop_package_travis_ci_url = pkg_develop_package_travis_ci_url,
                            domogik_releases = app.domogik_releases)
 
 
