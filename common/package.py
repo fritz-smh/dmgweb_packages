@@ -430,7 +430,7 @@ class Packages():
         cursor = self.db.cursor()
         cursor.execute('SELECT id, type, name, json FROM packages')
         for item in cursor:
-            #pkg = json.loads(item[1])
+            pkg = json.loads(item[1])
             #if pkg["type"] == pkg_type and pkg["name"] == pkg_name:
             if item[1] == pkg_type and item[2] == pkg_name:
                 msg = "This package has already been submitted by '{0}' (unique key is type/name)".format(pkg["author_email"])

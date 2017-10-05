@@ -52,6 +52,7 @@ Then, fill the configuration file **config.json**
     {
       "server_ip" : "0.0.0.0",
       "server_port" : "80",
+      "api_token" : "sometokenofyourchoicewhichisnoteasytoguess",
       "github" :
         {
           "skip" : false,
@@ -105,6 +106,37 @@ Create an **init.d** file. From the *dmgweb_packages* folder, run as **root** :
     sudo sed "s#___INSTALL_PATH___#$PWD/../#g" examples/init.sample > /etc/init.d/dmgweb_packages
     sudo sed -i "s#___USER___#${THE_USER}#g" /etc/init.d/dmgweb_packages 
     sudo chmod a+x /etc/init.d/dmgweb_packages
+
+
+
+
+Grab Domogik sources to be able to execute the review tool :
+
+    mkdir -p /opt/dmg
+    cd /opt/dmg
+    wget https://github.com/domogik/domogik/archive/develop.zip
+    unzip develop.zip
+    ln -s domogik-develop domogik
+
+Note : they should be updated from time to time
+
+
+Add the crontab rules (they are used to get the metrics pictures each day and do local backups each hour) :
+
+    0 * * * * /var/www/dmgweb_packages-dev/start-crontab.sh > /dev/null 2>&1
+    55 * * * * /var/www/dmgweb_packages-dev/backup.sh > /dev/null 2>&1
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 Prerequisite : twitter account

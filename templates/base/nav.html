@@ -14,24 +14,36 @@
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
-        <li>
-          <a href="{{ url_for("manage_packages") }}"><span class='glyphicon glyphicon-plus' aria-hidden='true'></span> {% trans %}Manage the packages{% endtrans %}</a>
-        </li>
       </ul>
+
+
       <ul class="nav navbar-nav navbar-right">
-        {% if g.user %}
-          <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class='glyphicon glyphicon-user' aria-hidden='true'></span> {{ g.username }} <span class="caret"></span></a> 
-            <ul class="dropdown-menu">
+        <li class="dropdown">
+          {% if g.user %}
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class='glyphicon glyphicon-wrench' aria-hidden='true'></span> {% trans %}Developpers{% endtrans %} <b class="caret"></b></a>
+          {% else %}
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class='glyphicon glyphicon-wrench' aria-hidden='true'></span> {{ g.username }}<b class="caret"></b></a>
+          {% endif %}
+          <ul class="dropdown-menu">
+            {% if g.user %}
               <li>
                 <a href="{{ url_for("logout") }}"><span class='glyphicon glyphicon-log-out' aria-hidden='true'></span> {% trans %}Logout{% endtrans %}</a>    
               </li>
-          </li>
-        {% elif not g.build %}
-          <li>
-            <a href="{{ url_for("login") }}"><span class='glyphicon glyphicon-log-in' aria-hidden='true'></span> {% trans %}Login (Github){% endtrans %}</a>    
-          </li>
-        {% endif %}
+            {% else %}
+              <li>
+                <a href="{{ url_for("login") }}"><span class='glyphicon glyphicon-log-in' aria-hidden='true'></span> {% trans %}Login (Github){% endtrans %}</a>    
+              </li>
+            {% endif %}
+            <li>
+              <a href="{{ url_for("manage_packages") }}"><span class='glyphicon glyphicon-plus' aria-hidden='true'></span> {% trans %}Manage the packages{% endtrans %}</a>
+            </li>
+            {% if g.user or g.username == "@developper" %}
+              <li>
+                <a href="{{ url_for("submitted_packages") }}"><span class='glyphicon glyphicon-flash' aria-hidden='true'></span> {% trans %}Look at the submitted packages{% endtrans %}</a>
+              </li>
+            {% endif %}
+          </ul>
+        </li>
       </ul>
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->

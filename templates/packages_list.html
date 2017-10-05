@@ -183,8 +183,9 @@ h3 {
         <div class="input-group-addon">{% trans %}Status :{% endtrans %}</div>
         <select class="form-control" id="status" name="status"> 
           <option>{% trans %}Any{% endtrans %}</option>
-          <option value="STABLE">{% trans %}Stable{% endtrans %}</option>
-          <option value="BETA">{% trans %}Beta{% endtrans %}</option>
+          {% for a_status_with_label in status_with_labels %}
+            <option value="{{ a_status_with_label[0] }}">{{ a_status_with_label[1] }}</option>
+          {% endfor %}
         </select>
       </div>
     </div>
@@ -222,6 +223,12 @@ h3 {
     });
   </script>
 
+  {% if stable_packages == False  %}
+    <div class="alert alert-danger" role="alert">
+      <p>{% trans %}All the below packages are NOT STABLE. Use them with caution!{% endtrans %}</p>
+      <p><a href="/">{% trans %}Go to the stable packages list.{% endtrans %}</p>
+    </div>
+  {% endif %}
   {% if packages|length == 0 %}
     <div class="alert alert-info" role="alert">{% trans %}There is no package published yet{% endtrans %}</div>
   {% endif %}
@@ -231,7 +238,7 @@ h3 {
       {% set display = {'value': False} %}
       {% for release in pkg.releases %}
          {# Filter on the release status #}
-         {% if release.status in ['BETA', 'STABLE'] %}
+         {% if release.status in status %}
            {# Hack to be able to set the flag and read it outside of the loop #}
            {% if display.update({'value': True}) %}
            {% endif %}
@@ -240,7 +247,7 @@ h3 {
       {% if display['value'] %}
             <button class="flex-item package rel-any status-any 
                      {% for release in pkg.releases %}  status-{{ release.status }}
-                       {% if release.status in ['BETA', 'STABLE'] %}
+                       {% if release.status in status %}
                          {% set compliant = {'value': False} %}
                          {% for dmg_release in domogik_releases %}
                            {% if dmg_release == release.domogik_min_release %}
@@ -259,7 +266,7 @@ h3 {
               <div>
                 {% for release in pkg.releases %}
                   {# Filter on the release status #}
-                  {% if release.status in ['BETA', 'STABLE'] %}
+                  {% if release.status in status %}
                     <span class="label label-success rel-any status-any status-{{release.status}}
                               {% set compliant = {'value': False} %}
                               {% for dmg_release in domogik_releases %}
@@ -286,7 +293,7 @@ h3 {
               <div class="modal-body">
                 {% for release in pkg.releases %}
                   {# Filter on the release status #}
-                  {% if release.status in ['BETA', 'STABLE'] %}
+                  {% if release.status in status %}
                     <div class="package panel  rel-any status-any status-{{ release.status }}
                               {% set compliant = {'value': False} %}
                               {% for dmg_release in domogik_releases %}
